@@ -15,8 +15,19 @@ No credentials are stored; set env vars when running.
   - Run server: `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' node node_modules/n8n-mcp-server/examples/mcp-n8n-server.js`
 
 - From source (clone/fork):
-  - `npm install`
+  - `npm install` (uses npm workspaces)
   - `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' npm start`
+
+## Monorepo
+
+This repository uses npm workspaces. It contains:
+- `@prodbybuddha/n8n-mcp-server` (root package)
+- `universal-openapi-mcp-generator` (internal package at `./universal-openapi-mcp-generator`)
+
+Run scripts across workspaces:
+- Install: `npm install`
+- Test server: `npm test`
+- Test all: `npm run test:all` (also runs generator package tests)
 
 ## Generate Tools (recommended)
 

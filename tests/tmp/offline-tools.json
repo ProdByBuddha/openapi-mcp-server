@@ -1,0 +1,25 @@
+{
+  "generatedAt": "2025-08-19T09:20:38.512Z",
+  "tools": [
+    {
+      "name": "getWidget",
+      "description": "Get widget",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "expand": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "method": "GET",
+      "pathTemplate": "/widgets/{id}"
+    }
+  ]
+}
