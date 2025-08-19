@@ -363,6 +363,9 @@ async function generateMcpTools(openApiSpec, options = {}) {
           name: toolName,
           description,
           inputSchema,
+          // Include minimal metadata to support offline JSON export
+          method: String(method || '').toUpperCase(),
+          pathTemplate: path,
           handler,
         });
       }
