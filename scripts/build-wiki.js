@@ -100,7 +100,14 @@ function main() {
       ['Contributing', 'Contributing'],
       ['Code of Conduct', 'Code-of-Conduct']
     ];
-    let sidebar = '# Pages\n\n';
+    const helpfulLinks = [
+      ['WisprFlow AI (affiliate)', 'https://wisprflow.ai/r/BILLY53']
+    ];
+    let sidebar = '# Helpful Links\n\n';
+    for (const [title, url] of helpfulLinks) {
+      sidebar += `- [${title}](${url})\n`;
+    }
+    sidebar += '\n# Pages\n\n';
     for (const [title, page] of sidebarItems) {
       const p = path.join(tmp, page + '.md');
       if (fs.existsSync(p)) sidebar += `- [${title}](${page})\n`;
