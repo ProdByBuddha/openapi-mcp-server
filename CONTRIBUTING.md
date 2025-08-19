@@ -25,3 +25,10 @@ Security
 - Use short‑lived API keys for testing
 - Do not log request bodies or headers
 - See `SECURITY.md` for hardening options and logging controls
+
+- Repo layout conventions
+  - Place bundled example OpenAPI specs under `examples/specs/` (these may be linted and referenced by examples and docs).
+  - Place local/vendor/private specs under `specs/` and reference them explicitly in configs (e.g., `examples/services.example.json`).
+  - Put ad‑hoc or helper scripts under `examples/scripts/` rather than the project root.
+  - Avoid adding large binary artifacts to the repo; prefer linking or generating at build/test time.
+

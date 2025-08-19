@@ -1,0 +1,20 @@
+{
+  "clients": [
+    {
+      "name": "multi-host",
+      "command": "node",
+      "args": ["examples/mcp-multi-host.js", "--config", "examples/services.example.json"],
+      "env": {
+        "N8N_API_KEY": "${env:N8N_API_KEY}",
+        "HOSTINGER_API_TOKEN": "${env:HOSTINGER_API_TOKEN}",
+        "OPENAPI_MCP_ALLOWED_METHODS": "GET,POST,PUT,PATCH,DELETE",
+        "OPENAPI_MCP_ALLOWED_PATHS": "/workflows*,/executions*,/audit*,/credentials*,/tags*,/users*,/source-control/pull*,/variables*,/projects*,/webhook*,/union-*",
+        "OPENAPI_MCP_RATE_LIMIT": "60",
+        "OPENAPI_MCP_RATE_BURST": "30",
+        "OPENAPI_MCP_RATE_WINDOW_MS": "60000",
+        "OPENAPI_MCP_CONCURRENCY": "8",
+        "OPENAPI_MCP_CONCURRENCY_PER_PATH": "4"
+      }
+    }
+  ]
+}

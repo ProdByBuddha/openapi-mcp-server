@@ -27,6 +27,19 @@ jobs:
           N8N_API_URL: ${{ secrets.N8N_API_URL }}
           N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
 
+      - name: Coverage (c8)
+        run: npx c8 -r text -r lcov node tests/run-all.js
+        env:
+          N8N_API_URL: ${{ secrets.N8N_API_URL }}
+          N8N_API_KEY: ${{ secrets.N8N_API_KEY }}
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+
   secrets-scan:
     runs-on: debian-latest
     steps:
@@ -37,4 +50,3 @@ jobs:
         uses: gitleaks/gitleaks-action@v2
         with:
           args: detect --redact --verbose
-

@@ -1,6 +1,6 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-openapi-server.js",
   "exports": {
@@ -30,9 +30,22 @@
     "mcp:n8n:once": "node examples/mcp-n8n-server.js --once",
     "mcp:openapi": "node examples/mcp-openapi-server.js",
     "mcp:openapi:once": "node examples/mcp-openapi-server.js --once",
+    "mcp:hostinger": "node examples/mcp-hostinger-server.js",
+    "mcp:hostinger:once": "node examples/mcp-hostinger-server.js --once",
     "mcp:gen": "node examples/generate-openapi-mcp-tools.js",
+    "mcp:gen:tools": "node examples/generate-openapi-mcp-tools.js",
+    "mcp:gen:server": "node examples/generate-openapi-mcp-tools.js --generate-server --baseUrl \"$OPENAPI_BASE_URL\"",
     "mcp:tools:readme": "node examples/build-tools-readme.js",
     "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}",
+    "openapi:lint": "node examples/lint-openapi.js --file examples/specs/hostinger-api.json",
+    "openapi:lint:all": "node examples/scripts/lint-all-specs.js",
+    "services:merge": "node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json",
+    "services:regen": "npm run openapi:lint:all && node examples/scripts/generate-services-from-specs.js --out examples/services.generated.json && node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json",
+    "services:report": "node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json --strategy report --report-out examples/services.conflicts.json",
+    "services:lint:config": "node examples/scripts/lint-services-config.js --file examples/services.merged.json",
+    "services:regen:report": "npm run openapi:lint:all && node examples/scripts/generate-services-from-specs.js --out examples/services.generated.json && node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json --strategy report --report-out examples/services.conflicts.json && npm run services:lint:config",
+    "donate:print": "node examples/scripts/print-donate.js",
+    "openapi:lint:file": "node examples/lint-openapi.js --file",
     "docs:wiki": "node scripts/build-wiki.js"
   },
   "keywords": [
@@ -43,14 +56,17 @@
     "automation",
     "openapi"
   ],
-  "author": "Billy Coleman III & Community Contributors",
+  "author": "Billy Coleman III",
   "license": "MIT",
   "dependencies": {
-    "swagger-parser": "^10.0.3"
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "swagger-parser": "^10.0.3",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.0",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.0.0"
   },
   "engines": {
     "node": ">=14.0.0"

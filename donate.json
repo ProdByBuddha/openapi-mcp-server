@@ -1,0 +1,12 @@
+{
+    "worldchain": "0xe4fdf9076dca468d839b51f75af35983b898821b",
+    "ethereum": "0x5f596473Dea9043B6338EF33a747CF0426EBcf92",
+    "bitcoin": "bc1qctmts3a2kmtfqskp0d5hrrew4gy9nhalu6mc4m",
+    "polygon": "0x5f596473Dea9043B6338EF33a747CF0426EBcf92",
+    "bsc": "0x5f596473Dea9043B6338EF33a747CF0426EBcf92",
+    "avalanche": "0x5f596473Dea9043B6338EF33a747CF0426EBcf92",
+    "arbitrum": "0x5f596473Dea9043B6338EF33a747CF0426EBcf92",
+    "optimism": "0x5f596473Dea9043B6338EF33a747CF0426EBcf92",
+    "solana": "2yUpjfwiQiv4pme1BSMLPpWgUcuWUMj6Q1KDetrPMc19",
+    "cardano": "addr1qyqn6zvqrhmx8h83eady5kk9ytfskrz4dgw6fcj32cxaetxyvpz05tv3rqhgc28qqpq5f9rvkvmpu60j43lfn4crcphs747ush"
+}
