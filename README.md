@@ -4,10 +4,10 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ProdByBuddha/openapi-mcp-server?sort=semver)](https://github.com/ProdByBuddha/openapi-mcp-server/releases)
 
-Generic OpenAPI → MCP tool server with a first‑class n8n integration. It can:
+Generic OpenAPI → MCP tool server with first‑class Docker, n8n & Hostinger integrations. It can:
 - Load any OpenAPI 3.x spec and generate MCP tools on the fly
 - Expose tools over stdio (initialize, tools/list, tools/call)
-- Provide a built‑in n8n server with convenience methods and workflow CLI
+- Provide built‑in servers with convenience methods and workflow CLI
 
 ## ☁️ Control Your Cloud Infrastructure
 
