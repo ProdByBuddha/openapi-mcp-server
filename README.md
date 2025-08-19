@@ -20,10 +20,10 @@ No credentials are stored; set env vars when running.
 
 ## Generator API
 
-The OpenAPI→MCP tool generator is bundled in this package under `lib/openapi-generator`.
-You can import it programmatically or use the example CLI to pre‑generate tools JSON.
+The OpenAPI→MCP tool generator is bundled in this package and exposed via a subpath export.
+Use it programmatically or via the example CLI to pre‑generate tools JSON.
 
-- Programmatic: `const { generateMcpTools } = require('./lib/openapi-generator');`
+- Programmatic: `const { generateMcpTools } = require('n8n-mcp-server/lib/openapi-generator');`
 - CLI: `node examples/generate-n8n-mcp-tools.js --from-url <specUrl> --out examples/generated/n8n-openapi-tools.json`
 
 The server can also load OpenAPI specs dynamically on startup via env vars
