@@ -51,6 +51,25 @@ Optionally override the base URL used by generated tools:
 
 If neither env is set, the server will fall back to loading `examples/generated/n8n-openapi-tools.json` when present.
 
+## Generic OpenAPI Server
+
+This repo also includes a generic OpenAPI→MCP server that can expose any OpenAPI 3.x API as MCP tools.
+
+- Run: `OPENAPI_SPEC_FILE=./openapi.json npm run mcp:openapi`
+- Or: `OPENAPI_SPEC_URL=https://api.example.com/openapi.json npm run mcp:openapi`
+- Optional: `OPENAPI_BASE_URL=https://api.example.com/v1`
+
+Auth helpers (optional, used to populate security handlers):
+- `OPENAPI_API_KEY` or scheme-specific `OPENAPI_APIKEY_<SCHEMENAME>`
+- `OPENAPI_BEARER_TOKEN`
+- `OPENAPI_BASIC_USER` and `OPENAPI_BASIC_PASS`
+
+Policy controls (optional):
+- `OPENAPI_MCP_ALLOWED_METHODS` (e.g., `GET,POST`)
+- `OPENAPI_MCP_ALLOWED_PATHS` (e.g., `/v1/users*,/v1/*`)
+- `OPENAPI_MCP_RATE_LIMIT` and `OPENAPI_MCP_RATE_WINDOW_MS`
+- Logging: `OPENAPI_MCP_LOG_FILE`, `OPENAPI_MCP_LOG_MAX_SIZE`, `OPENAPI_MCP_LOG_MAX_FILES`, `OPENAPI_MCP_LOG_FORMAT`
+
 ## Configuration
 
 Set environment variables directly or via `.env` (see `.env.example`):
