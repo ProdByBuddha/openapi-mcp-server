@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/universal-openapi-mcp-generator.svg)](https://www.npmjs.com/package/universal-openapi-mcp-generator)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 [![node](https://img.shields.io/node/v/universal-openapi-mcp-generator.svg)](https://nodejs.org/)
-[![CI](https://img.shields.io/github/actions/workflow/status/OWNER/REPO/ci.yml?branch=main)](https://github.com/prodbybuddha/universal-openapi-mcp-generator/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/ProdByBuddha/universal-openapi-mcp-generator/ci.yml?branch=main)](https://github.com/prodbybuddha/universal-openapi-mcp-generator/actions)
 This module provides a universal way to generate Model Context Protocol (MCP) tool definitions directly from an OpenAPI (Swagger) specification.
 
 It aims to simplify the process of exposing REST APIs as MCP tools, enabling AI agents to interact with various services through a standardized protocol.
@@ -156,7 +156,7 @@ const tools = await generateMcpTools(spec, { httpRequest: jest.fn(async () => ({
 
 4) Release notes and badges
 - Create a GitHub release from the tag; paste changelog section.
-- Replace `OWNER/REPO` in the CI badge above with your repository path.
+- Replace `ProdByBuddha/universal-openapi-mcp-generator` in the CI badge above with your repository path.
 - Confirm badges render correctly on README.
 
 ## Contributing

@@ -1,0 +1,41 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    environment:
+      name: npm-publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: npm whoami (debug)
+        run: npm whoami || true
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: echo "PKG_VERSION=$(node -p \"require('./package.json').version\")" >> $GITHUB_ENV
+      - name: Check if version exists on npm
+        id: check_version
+        run: |
+          node -e "const v=require('./package.json').version;let a=[];try{a=JSON.parse(require('child_process').execSync('npm view universal-openapi-mcp-generator versions --json',{stdio:['ignore','pipe','ignore']}).toString())||[]}catch(e){};const exists=Array.isArray(a)&&a.includes(v);console.log('exists='+exists); if(exists){process.exit(0)}else{process.exit(1)}" || echo "EXISTS=false" >> $GITHUB_ENV
+          if node -e "const v=require('./package.json').version;let a=[];try{a=JSON.parse(require('child_process').execSync('npm view universal-openapi-mcp-generator versions --json',{stdio:['ignore','pipe','ignore']}).toString())||[]}catch(e){};process.exit(!(Array.isArray(a)&&a.includes(v)))"; then echo "EXISTS=true" >> $GITHUB_ENV; else echo "EXISTS=false" >> $GITHUB_ENV; fi
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Publish to npm
+        if: env.EXISTS != 'true'
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
