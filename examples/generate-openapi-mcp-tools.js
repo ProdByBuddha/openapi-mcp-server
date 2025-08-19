@@ -1,6 +1,6 @@
 /*
  * Generate MCP tool definitions from an OpenAPI spec using the bundled
- * universal-openapi-mcp-generator. Produces a serializable JSON file that the
+ * openapi generator. Produces a serializable JSON file that the
  * server can load offline.
  *
  * - Input: --from-url <url> or --from-file <path>
@@ -113,7 +113,7 @@ async function main() {
   } else if (args['from-url']) {
     spec = await loadSpecFromUrl(args['from-url']);
   } else {
-    console.error('Usage: node examples/generate-n8n-mcp-tools.js --from-url <url> | --from-file <path> [--out <path>]');
+    console.error('Usage: node examples/generate-openapi-mcp-tools.js --from-url <url> | --from-file <path> [--out <path>]');
     process.exit(1);
   }
 
@@ -124,3 +124,4 @@ async function main() {
 }
 
 main();
+
