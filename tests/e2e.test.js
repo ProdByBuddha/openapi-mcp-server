@@ -71,7 +71,7 @@ async function runNode(cmd, args, env = {}) {
 async function generateTools() {
   const apiUrl = requireEnv('N8N_API_URL').replace(/\/$/, '');
   const specUrl = `${apiUrl}/docs/swagger-ui-init.js`;
-  const genScript = path.resolve(__dirname, '..', 'examples', 'generate-n8n-mcp-tools.js');
+  const genScript = path.resolve(__dirname, '..', 'examples', 'generate-openapi-mcp-tools.js');
   const outPath = path.resolve(__dirname, '..', 'examples', 'generated', 'n8n-openapi-tools.json');
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   log(`Generating tools from: ${specUrl}`);

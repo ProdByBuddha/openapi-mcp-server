@@ -52,7 +52,7 @@ for (const p of envCandidates) {
 const toolsJson = path.resolve(__dirname, '..', 'examples', 'generated', 'n8n-openapi-tools.json');
 if (!fs.existsSync(toolsJson) && process.env.N8N_API_URL && process.env.N8N_API_KEY) {
   console.log('Generating tools JSON...');
-  const gen = spawnSync(process.execPath, [path.resolve(__dirname, '..', 'examples', 'generate-n8n-mcp-tools.js'), '--from-url', String(process.env.N8N_API_URL).replace(/\$/, '') + '/docs/swagger-ui-init.js', '--out', toolsJson], { stdio: 'inherit', env: process.env });
+  const gen = spawnSync(process.execPath, [path.resolve(__dirname, '..', 'examples', 'generate-openapi-mcp-tools.js'), '--from-url', String(process.env.N8N_API_URL).replace(/\$/, '') + '/docs/swagger-ui-init.js', '--out', toolsJson], { stdio: 'inherit', env: process.env });
   if (gen.status !== 0) process.exit(gen.status);
 }
 
