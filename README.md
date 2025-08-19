@@ -27,6 +27,19 @@ No credentials are stored; set env vars when running.
 - Build index (pretty list):
   - `npm run mcp:tools:readme` → writes `examples/generated/TOOLS.md`
 
+### Dynamic OpenAPI tools (no pre-gen step)
+
+The server can load OpenAPI tools at startup via the bundled generator. Set one of:
+
+- `OPENAPI_SPEC_FILE=./path/to/openapi.json npm run mcp:n8n`
+- `OPENAPI_SPEC_URL=https://api.example.com/openapi.json npm run mcp:n8n`
+
+Optionally override the base URL used by generated tools:
+
+- `OPENAPI_BASE_URL=https://api.example.com/v1`
+
+If neither env is set, the server will fall back to loading `examples/generated/n8n-openapi-tools.json` when present.
+
 ## Configuration
 
 Set environment variables directly or via `.env` (see `.env.example`):

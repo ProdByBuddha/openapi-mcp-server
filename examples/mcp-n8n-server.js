@@ -289,27 +289,87 @@ const tools = [
 
 
 
-// Load auto-generated OpenAPI tools if available
+// Option A: Dynamically generate OpenAPI-derived tools at startup via local generator
+// Configure with OPENAPI_SPEC_FILE or OPENAPI_SPEC_URL. Optionally OPENAPI_BASE_URL overrides spec servers[].url
 try {
-  const genPath = path.resolve(__dirname, 'generated', 'n8n-openapi-tools.json');
-  if (fs.existsSync(genPath)) {
-    const gen = JSON.parse(fs.readFileSync(genPath, 'utf8'));
-    const generated = Array.isArray(gen.tools) ? gen.tools : [];
-    for (const t of generated) {
-      const { name, description, method, pathTemplate, inputSchema } = t;
-      // Create a handler that fills path params into the template
-      const handler = async (args = {}) => {
-        let p = String(pathTemplate);
-        // Replace {param} with args[param] if present
-        p = p.replace(/\{([^}]+)\}/g, (_, k) => {
-          if (!(k in args)) throw new Error(`Missing path param: ${k}`);
-          return encodeURIComponent(String(args[k]));
-        });
-        const query = args.query || undefined;
-        const body = args.body || undefined;
-        return n8nRequest({ method: method || 'GET', path: p, query, body });
-      };
-      tools.push({ name, description: description || '', inputSchema: inputSchema || { type: 'object' }, handler });
+  const SPEC_FILE = process.env.OPENAPI_SPEC_FILE || '';
+  const SPEC_URL = process.env.OPENAPI_SPEC_URL || '';
+  const OPENAPI_BASE_URL = process.env.OPENAPI_BASE_URL || process.env.N8N_API_URL || '';
+  if (SPEC_FILE || SPEC_URL) {
+    const { generateMcpTools } = require('../universal-openapi-mcp-generator');
+
+    async function loadOpenApiSpec() {
+      if (SPEC_FILE) {
+        const raw = fs.readFileSync(path.resolve(process.cwd(), SPEC_FILE), 'utf8');
+        try { return JSON.parse(raw); } catch (_) { throw new Error('OPENAPI_SPEC_FILE must be JSON'); }
+      }
+      // SPEC_URL path
+      await new Promise((resolve) => setImmediate(resolve)); // yield
+      return await new Promise((resolve, reject) => {
+        try {
+          const u = new URL(SPEC_URL);
+          const lib = u.protocol === 'https:' ? https : http;
+          const req = lib.request({
+            protocol: u.protocol,
+            hostname: u.hostname,
+            port: u.port || (u.protocol === 'https:' ? 443 : 80),
+            path: u.pathname + u.search,
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+          }, (res) => {
+            let body = '';
+            res.setEncoding('utf8');
+            res.on('data', (c) => (body += c));
+            res.on('end', () => {
+              try { resolve(JSON.parse(body)); }
+              catch (err) { reject(new Error('OPENAPI_SPEC_URL did not return JSON')); }
+            });
+          });
+          req.on('error', reject);
+          req.end();
+        } catch (err) { reject(err); }
+      });
+    }
+
+    (async () => {
+      try {
+        const spec = await loadOpenApiSpec();
+        const genTools = await generateMcpTools(spec, { baseUrl: OPENAPI_BASE_URL || undefined });
+        for (const t of genTools) {
+          tools.push({
+            name: t.name,
+            description: t.description || '',
+            inputSchema: t.inputSchema || { type: 'object' },
+            handler: t.handler
+          });
+        }
+        // eslint-disable-next-line no-console
+        console.log(`[mcp-n8n] Loaded ${genTools.length} OpenAPI tools`);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('[mcp-n8n] Failed to load OpenAPI tools:', err.message);
+      }
+    })();
+  } else {
+    // Option B: Load pre-generated OpenAPI tools JSON if present
+    const genPath = path.resolve(__dirname, 'generated', 'n8n-openapi-tools.json');
+    if (fs.existsSync(genPath)) {
+      const gen = JSON.parse(fs.readFileSync(genPath, 'utf8'));
+      const generated = Array.isArray(gen.tools) ? gen.tools : [];
+      for (const t of generated) {
+        const { name, description, method, pathTemplate, inputSchema } = t;
+        const handler = async (args = {}) => {
+          let p = String(pathTemplate);
+          p = p.replace(/\{([^}]+)\}/g, (_, k) => {
+            if (!(k in args)) throw new Error(`Missing path param: ${k}`);
+            return encodeURIComponent(String(args[k]));
+          });
+          const query = args.query || undefined;
+          const body = args.body || undefined;
+          return n8nRequest({ method: method || 'GET', path: p, query, body });
+        };
+        tools.push({ name, description: description || '', inputSchema: inputSchema || { type: 'object' }, handler });
+      }
     }
   }
 } catch (e) {
