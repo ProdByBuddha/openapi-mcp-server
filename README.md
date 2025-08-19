@@ -29,7 +29,7 @@ The OpenAPI→MCP tool generator is bundled in this package and exposed via a su
 Use it programmatically or via the example CLI to pre‑generate tools JSON.
 
 - Programmatic: `const { generateMcpTools } = require('@prodbybuddha/openapi-mcp-server/lib/openapi-generator');`
-- CLI: `node examples/generate-n8n-mcp-tools.js --from-url <specUrl> --out examples/generated/n8n-openapi-tools.json`
+- CLI: `node examples/generate-openapi-mcp-tools.js --from-url <specUrl> --out examples/generated/n8n-openapi-tools.json`
 
 The server can also load OpenAPI specs dynamically on startup via env vars
 (`OPENAPI_SPEC_FILE` or `OPENAPI_SPEC_URL`) without pre‑generation.
@@ -47,8 +47,8 @@ The server can also load OpenAPI specs dynamically on startup via env vars
 
 The server can load OpenAPI tools at startup via the bundled generator. Set one of:
 
-- `OPENAPI_SPEC_FILE=./path/to/openapi.json npm run mcp:n8n`
-- `OPENAPI_SPEC_URL=https://api.example.com/openapi.json npm run mcp:n8n`
+- `OPENAPI_SPEC_FILE=./path/to/openapi.json npm run mcp:openapi`
+- `OPENAPI_SPEC_URL=https://api.example.com/openapi.json npm run mcp:openapi`
 
 Optionally override the base URL used by generated tools:
 
