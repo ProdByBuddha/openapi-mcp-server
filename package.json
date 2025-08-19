@@ -1,5 +1,5 @@
 {
-  "name": "n8n-mcp-server",
+  "name": "@prodbybuddha/n8n-mcp-server",
   "version": "1.0.0",
   "description": "MCP server and CLI utilities for n8n (OpenAPI-generated tools, workflow management)",
   "main": "examples/mcp-n8n-server.js",
@@ -38,11 +38,13 @@
   "engines": {
     "node": ">=14.0.0"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ProdByBuddha/n8n-mcp-server.git"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/ProdByBuddha/n8n-mcp-server/issues"
+  },
+  "homepage": "https://github.com/ProdByBuddha/n8n-mcp-server/wiki",
+  "private": false
 }
