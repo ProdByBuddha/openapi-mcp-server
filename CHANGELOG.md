@@ -28,3 +28,17 @@ All notable changes to this project will be documented in this file.
 
 1.0.0 - 2025-08-19
 - Initial release of n8n MCP server with example CLI and tests.
+## 1.3.0 - 2025-08-19
+
+### Added
+- WebSocket transport for generated servers (`--transport ws`), template now depends on `ws`.
+- `DEBUG_HTTP` env to toggle HTTP request/response logging in generated servers.
+- Live auth tests for apiKey/bearer/basic and serialization unit tests for all auth schemes.
+- Scripts: `mcp:gen:tools`, `mcp:gen:server`; examples/README with quickstarts.
+- CI coverage via `c8` and artifact upload of `lcov`.
+
+### Changed
+- Generator now preserves OAuth2 `clientCredentials.tokenUrl` and includes `paramName` for `apiKey` schemes in `serializationInfo.security`.
+- Generated server templates hardened with method/path allowlists and rate limiting controls (`OPENAPI_MCP_*`).
+- Improved validation: Zod conversion respects `required`, supports non-string enums, and keeps constraints.
+- OAuth2 client credentials flow adds basic retry/backoff, timeouts, and in-memory token caching.

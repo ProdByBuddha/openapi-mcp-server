@@ -1,0 +1,39 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Auth Schemes Test API", "version": "1.0.0" },
+  "servers": [ { "url": "http://localhost:3999" } ],
+  "components": {
+    "securitySchemes": {
+      "api_key": { "type": "apiKey", "in": "header", "name": "X-API-Key" },
+      "bearer_auth": { "type": "http", "scheme": "bearer" },
+      "basic_auth": { "type": "http", "scheme": "basic" }
+    }
+  },
+  "paths": {
+    "/ping-api-key": {
+      "get": {
+        "operationId": "pingApiKey",
+        "summary": "Ping with API key",
+        "security": [ { "api_key": [] } ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/ping-bearer": {
+      "get": {
+        "operationId": "pingBearer",
+        "summary": "Ping with bearer",
+        "security": [ { "bearer_auth": [] } ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    },
+    "/ping-basic": {
+      "get": {
+        "operationId": "pingBasic",
+        "summary": "Ping with basic",
+        "security": [ { "basic_auth": [] } ],
+        "responses": { "200": { "description": "ok" } }
+      }
+    }
+  }
+}
+
