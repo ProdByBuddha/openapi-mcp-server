@@ -19,4 +19,6 @@ backups/
 data/
 generated-*server/
 scripts*
+
+RELEASE.md
 # Keep generated tools in VCS (do NOT ignore examples/generated)
