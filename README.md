@@ -1,29 +1,34 @@
-# n8n MCP Server (n8n-mcp-server)
+# OpenAPI MCP Server (@prodbybuddha/openapi-mcp-server)
 
-[![npm version](https://img.shields.io/npm/v/n8n-mcp-server?logo=npm&color=cb0000)](https://www.npmjs.com/package/n8n-mcp-server)
+[![npm version](https://img.shields.io/npm/v/@prodbybuddha/openapi-mcp-server?logo=npm&color=cb0000)](https://www.npmjs.com/package/@prodbybuddha/openapi-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ProdByBuddha/n8n-mcp-server?sort=semver)](https://github.com/ProdByBuddha/n8n-mcp-server/releases)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ProdByBuddha/openapi-mcp-server?sort=semver)](https://github.com/ProdByBuddha/openapi-mcp-server/releases)
 
-MCP server + CLI for n8n. It generates MCP tools directly from the official n8n Public API (OpenAPI), exposes them over stdio (initialize, tools/list, tools/call), and includes a small CLI for listing/exporting/updating workflows.
+Generic OpenAPI → MCP tool server with a first‑class n8n integration. It can:
+- Load any OpenAPI 3.x spec and generate MCP tools on the fly
+- Expose tools over stdio (initialize, tools/list, tools/call)
+- Provide a built‑in n8n server with convenience methods and workflow CLI
 
 No credentials are stored; set env vars when running.
 
 ## Install
 
 - From npm (use inside your project):
-  - `npm install n8n-mcp-server`
-  - Run server: `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' node node_modules/n8n-mcp-server/examples/mcp-n8n-server.js`
+  - `npm install @prodbybuddha/openapi-mcp-server`
+  - Generic server: `OPENAPI_SPEC_URL='https://api.example.com/openapi.json' node node_modules/@prodbybuddha/openapi-mcp-server/examples/mcp-openapi-server.js`
+  - n8n server: `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' node node_modules/@prodbybuddha/openapi-mcp-server/examples/mcp-n8n-server.js`
 
 - From source (clone/fork):
-  - `npm install` (uses npm workspaces)
-  - `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' npm start`
+  - `npm install`
+  - Generic server: `OPENAPI_SPEC_URL='https://api.example.com/openapi.json' npm run mcp:openapi`
+  - n8n server: `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' npm run mcp:n8n`
 
 ## Generator API
 
 The OpenAPI→MCP tool generator is bundled in this package and exposed via a subpath export.
 Use it programmatically or via the example CLI to pre‑generate tools JSON.
 
-- Programmatic: `const { generateMcpTools } = require('@prodbybuddha/n8n-mcp-server/lib/openapi-generator');`
+- Programmatic: `const { generateMcpTools } = require('@prodbybuddha/openapi-mcp-server/lib/openapi-generator');`
 - CLI: `node examples/generate-n8n-mcp-tools.js --from-url <specUrl> --out examples/generated/n8n-openapi-tools.json`
 
 The server can also load OpenAPI specs dynamically on startup via env vars

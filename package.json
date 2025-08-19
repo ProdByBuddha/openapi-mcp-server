@@ -1,11 +1,12 @@
 {
-  "name": "@prodbybuddha/n8n-mcp-server",
-  "version": "1.1.1",
-  "description": "MCP server and CLI utilities for n8n (OpenAPI-generated tools, workflow management)",
-  "main": "examples/mcp-n8n-server.js",
+  "name": "@prodbybuddha/openapi-mcp-server",
+  "version": "1.2.0",
+  "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
+  "main": "examples/mcp-openapi-server.js",
   "exports": {
-    ".": "./examples/mcp-n8n-server.js",
-    "./lib/openapi-generator": "./lib/openapi-generator/index.js"
+    ".": "./examples/mcp-openapi-server.js",
+    "./lib/openapi-generator": "./lib/openapi-generator/index.js",
+    "./examples/mcp-n8n-server": "./examples/mcp-n8n-server.js"
   },
   "files": [
     "lib",
@@ -55,12 +56,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ProdByBuddha/n8n-mcp-server.git"
+    "url": "git+https://github.com/ProdByBuddha/openapi-mcp-server.git"
   },
   "bugs": {
-    "url": "https://github.com/ProdByBuddha/n8n-mcp-server/issues"
+    "url": "https://github.com/ProdByBuddha/openapi-mcp-server/issues"
   },
-  "homepage": "https://github.com/ProdByBuddha/n8n-mcp-server/wiki",
+  "homepage": "https://github.com/ProdByBuddha/openapi-mcp-server/wiki",
   "private": false,
   "publishConfig": {
     "access": "public",
