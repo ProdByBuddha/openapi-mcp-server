@@ -16,3 +16,8 @@ All notable changes to this project will be documented in this file.
 
 1.0.0 - 2025-08-19
 - Initial release of n8n MCP server with example CLI and tests.
+1.2.0 - 2025-08-19
+- Rename package to `@prodbybuddha/openapi-mcp-server` to reflect generalized scope.
+- Make generic OpenAPI server the primary entry point.
+- Keep n8n-specific server available under `examples/mcp-n8n-server.js`.
+- Update exports, README, and repository links.
