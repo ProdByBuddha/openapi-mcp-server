@@ -2,7 +2,7 @@
 
 ## Supported Versions
 
-The latest `main` branch is supported. Please update to the latest version before reporting issues.
+The latest `master` branch is supported. Please update to the latest version before reporting issues.
 
 ## Reporting a Vulnerability
 
