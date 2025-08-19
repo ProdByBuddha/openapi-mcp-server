@@ -1,6 +1,6 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-openapi-server.js",
   "exports": {
@@ -32,7 +32,8 @@
     "mcp:openapi:once": "node examples/mcp-openapi-server.js --once",
     "mcp:gen": "node examples/generate-openapi-mcp-tools.js",
     "mcp:tools:readme": "node examples/build-tools-readme.js",
-    "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}"
+    "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}",
+    "docs:wiki": "node scripts/build-wiki.js"
   },
   "keywords": [
     "n8n",
@@ -66,5 +67,9 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "funding": {
+    "type": "donation",
+    "url": "https://donate.stripe.com/9AQbLka97fFx75K8ww"
   }
 }
