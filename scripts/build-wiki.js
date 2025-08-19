@@ -101,22 +101,42 @@ function main() {
       ['Code of Conduct', 'Code-of-Conduct']
     ];
     const helpfulLinks = [
-      ['WisprFlow AI (affiliate)', 'https://wisprflow.ai/r/BILLY53']
+      ['🚀 WisprFlow AI (affiliate)', 'https://wisprflow.ai/r/BILLY53']
     ];
-    let sidebar = '# Helpful Links\n\n';
+    let sidebar = '## ✨ Helpful Links\n\n';
     for (const [title, url] of helpfulLinks) {
-      sidebar += `- [${title}](${url})\n`;
+      sidebar += `- ${title} → [Open](${url})\n`;
     }
-    sidebar += '\n# Pages\n\n';
+    sidebar += '\n## 📚 Pages\n\n';
+    const pageIcons = {
+      'Home': '🏠',
+      'Tools': '🧰',
+      'Changelog': '📝',
+      'Security': '🔐',
+      'Contributing': '🤝',
+      'Code of Conduct': '📜'
+    };
     for (const [title, page] of sidebarItems) {
       const p = path.join(tmp, page + '.md');
-      if (fs.existsSync(p)) sidebar += `- [${title}](${page})\n`;
+      if (fs.existsSync(p)) sidebar += `- ${pageIcons[title] || ''} [${title}](${page})\n`;
     }
+    sidebar += '\n## ⚡ Quick Commands\n\n';
+    sidebar += '- OpenAPI Server: `npm run mcp:openapi`\n';
+    sidebar += '- n8n Server: `npm run mcp:n8n`\n';
     fs.writeFileSync(path.join(tmp, '_Sidebar.md'), sidebar);
     pages.push('_Sidebar.md');
 
     const donationUrl = 'https://donate.stripe.com/9AQbLka97fFx75K8ww';
-    const footer = `If this project helps you, consider supporting.\n\n[Buy Me A Coffee](${donationUrl})\n`;
+    const footer = [
+      '<div align="center">',
+      '',
+      '— Made with ❤️ —',
+      '',
+      `[![Buy Me A Coffee](https://img.shields.io/badge/Support-Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=black)](${donationUrl})`,
+      '',
+      '</div>',
+      ''
+    ].join('\n');
     fs.writeFileSync(path.join(tmp, '_Footer.md'), footer);
     pages.push('_Footer.md');
   } catch (_) {}
