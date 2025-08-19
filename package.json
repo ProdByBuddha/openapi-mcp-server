@@ -32,7 +32,8 @@
     "mcp:openapi:once": "node examples/mcp-openapi-server.js --once",
     "mcp:gen": "node examples/generate-openapi-mcp-tools.js",
     "mcp:tools:readme": "node examples/build-tools-readme.js",
-    "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}"
+    "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}",
+    "docs:wiki": "node scripts/build-wiki.js"
   },
   "keywords": [
     "n8n",
