@@ -1,6 +1,6 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-openapi-server.js",
   "exports": {
@@ -67,5 +67,9 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "funding": {
+    "type": "donation",
+    "url": "https://donate.stripe.com/9AQbLka97fFx75K8ww"
   }
 }
