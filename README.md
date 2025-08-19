@@ -11,6 +11,12 @@ Generic OpenAPI → MCP tool server with a first‑class n8n integration. It can
 
 No credentials are stored; set env vars when running.
 
+## Support
+
+If this project helps you, consider supporting:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Support-Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://donate.stripe.com/9AQbLka97fFx75K8ww)
+
 ## Install
 
 - From npm (use inside your project):
