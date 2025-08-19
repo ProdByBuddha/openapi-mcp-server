@@ -3,7 +3,7 @@ const path = require('path');
 const assert = require('assert');
 const { spawnSync } = require('child_process');
 
-const { generateMcpTools } = require('../universal-openapi-mcp-generator');
+const { generateMcpTools } = require('../lib/openapi-generator');
 
 function writeJson(filePath, obj) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
