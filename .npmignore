@@ -1,0 +1,8 @@
+node_modules/
+backups/
+data/
+.env
+.env.*.local
+.npm-cache/
+.github/
+examples/generated/

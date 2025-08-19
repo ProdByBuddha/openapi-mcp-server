@@ -1,0 +1,41 @@
+{
+  "name": "n8n-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server and CLI utilities for n8n (OpenAPI-generated tools, workflow management)",
+  "main": "examples/mcp-n8n-server.js",
+  "scripts": {
+    "start": "node examples/mcp-n8n-server.js",
+    "test": "node tests/run-all.js",
+    "dev": "nodemon examples/mcp-n8n-server.js",
+    "n8n:list": "node examples/n8n-workflows-cli.js list",
+    "n8n:get": "node examples/n8n-workflows-cli.js get",
+    "n8n:export": "node examples/n8n-workflows-cli.js export",
+    "n8n:update": "node examples/n8n-workflows-cli.js update",
+    "n8n:dump": "node examples/n8n-workflows-cli.js dump-all",
+    "n8n:activate": "node examples/n8n-workflows-cli.js activate",
+    "n8n:deactivate": "node examples/n8n-workflows-cli.js deactivate",
+    "mcp:n8n": "node examples/mcp-n8n-server.js",
+    "mcp:n8n:once": "node examples/mcp-n8n-server.js --once",
+    "mcp:gen": "node examples/generate-n8n-mcp-tools.js",
+    "mcp:tools:readme": "node examples/build-tools-readme.js",
+    "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}"
+  },
+  "keywords": [
+    "n8n",
+    "mcp",
+    "model context protocol",
+    "cli",
+    "automation",
+    "openapi"
+  ],
+  "author": "Billy Coleman III & Community Contributors",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "nodemon": "^3.0.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
