@@ -2,6 +2,10 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
+1.1.1 - 2025-08-19
+- Publish under scoped name `@prodbybuddha/n8n-mcp-server` on npm.
+- Update README imports to use scoped path export.
+
 1.1.0 - 2025-08-19
 - Inline OpenAPI generator into main package under `lib/openapi-generator`.
 - Add subpath export `n8n-mcp-server/lib/openapi-generator` for programmatic use.
@@ -12,4 +16,3 @@ All notable changes to this project will be documented in this file.
 
 1.0.0 - 2025-08-19
 - Initial release of n8n MCP server with example CLI and tests.
-
