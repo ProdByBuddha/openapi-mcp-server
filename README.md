@@ -1,7 +1,7 @@
 # n8n MCP Server (n8n-mcp-server)
 
-[![CI](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/ci.yml)
-[![Auto Update Tools](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/update-tools.yml/badge.svg)](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/update-tools.yml)
+# [![CI](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/ci.yml/badge.svg)](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/ci.yml)
+# [![Auto Update Tools](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/update-tools.yml/badge.svg)](https://github.com/ProdByBuddha/n8n-mcp-server/actions/workflows/update-tools.yml)
 [![npm version](https://img.shields.io/npm/v/n8n-mcp-server?logo=npm&color=cb0000)](https://www.npmjs.com/package/n8n-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ProdByBuddha/n8n-mcp-server?sort=semver)](https://github.com/ProdByBuddha/n8n-mcp-server/releases)
