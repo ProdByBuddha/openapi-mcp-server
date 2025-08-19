@@ -90,6 +90,30 @@ function main() {
     process.exit(0);
   }
 
+  // Sidebar and Footer
+  try {
+    const sidebarItems = [
+      ['Home', 'Home'],
+      ['Tools', 'Tools'],
+      ['Changelog', 'Changelog'],
+      ['Security', 'Security'],
+      ['Contributing', 'Contributing'],
+      ['Code of Conduct', 'Code-of-Conduct']
+    ];
+    let sidebar = '# Pages\n\n';
+    for (const [title, page] of sidebarItems) {
+      const p = path.join(tmp, page + '.md');
+      if (fs.existsSync(p)) sidebar += `- [${title}](${page})\n`;
+    }
+    fs.writeFileSync(path.join(tmp, '_Sidebar.md'), sidebar);
+    pages.push('_Sidebar.md');
+
+    const donationUrl = 'https://donate.stripe.com/9AQbLka97fFx75K8ww';
+    const footer = `If this project helps you, consider supporting.\n\n[Buy Me A Coffee](${donationUrl})\n`;
+    fs.writeFileSync(path.join(tmp, '_Footer.md'), footer);
+    pages.push('_Footer.md');
+  } catch (_) {}
+
   run('git', ['add', '-A']);
   // Check if there are changes
   const status = spawnSync('git', ['diff', '--cached', '--quiet'], { stdio: 'inherit' });
@@ -103,4 +127,3 @@ function main() {
 }
 
 main();
-
