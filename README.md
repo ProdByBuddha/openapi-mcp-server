@@ -15,8 +15,19 @@ No credentials are stored; set env vars when running.
   - Run server: `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' node node_modules/n8n-mcp-server/examples/mcp-n8n-server.js`
 
 - From source (clone/fork):
-  - `npm install`
+  - `npm install` (uses npm workspaces)
   - `N8N_API_URL='https://your-n8n/api/v1' N8N_API_KEY='<key>' npm start`
+
+## Generator API
+
+The OpenAPI→MCP tool generator is bundled in this package and exposed via a subpath export.
+Use it programmatically or via the example CLI to pre‑generate tools JSON.
+
+- Programmatic: `const { generateMcpTools } = require('n8n-mcp-server/lib/openapi-generator');`
+- CLI: `node examples/generate-n8n-mcp-tools.js --from-url <specUrl> --out examples/generated/n8n-openapi-tools.json`
+
+The server can also load OpenAPI specs dynamically on startup via env vars
+(`OPENAPI_SPEC_FILE` or `OPENAPI_SPEC_URL`) without pre‑generation.
 
 ## Generate Tools (recommended)
 

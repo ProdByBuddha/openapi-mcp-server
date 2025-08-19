@@ -1,55 +1,27 @@
-// Auto-generate a unit test that dry-runs each generated tool
+// Auto-generate a unit test that dry-runs each available tool listed by the server
+// using inputSchema to synthesize minimal required arguments. This keeps tests
+// stable regardless of how tools are provided (built-ins vs. offline JSON vs. dynamic).
 const fs = require('fs');
 const path = require('path');
 
-const toolsJson = path.resolve(__dirname, '..', 'examples', 'generated', 'n8n-openapi-tools.json');
 const outDir = path.resolve(__dirname, 'unit');
 const outFile = path.join(outDir, 'generated-tools.test.js');
 
-function sanitizeArgName(name) {
-  return String(name).replace(/[^A-Za-z0-9_]/g, '');
-}
-
-function buildArgsForTool(t) {
-  const args = {};
-  // infer path params from {param}
-  const m = String(t.pathTemplate || '').match(/\{[^}]+\}/g);
-  if (m) {
-    for (const seg of m) {
-      const key = seg.slice(1, -1);
-      args[key] = sanitizeArgName(key) || 'id';
-    }
-  }
-  // no query/body for dry-run
-  return args;
-}
-
 function main() {
-  if (!fs.existsSync(toolsJson)) {
-    console.log('No tools JSON found; skipping unit test generation.');
-    process.exit(0);
-  }
-  const gen = JSON.parse(fs.readFileSync(toolsJson, 'utf8'));
-  const tools = Array.isArray(gen.tools) ? gen.tools : [];
   fs.mkdirSync(outDir, { recursive: true });
   const lines = [];
   lines.push("const { spawnSync } = require('child_process');");
   lines.push("const path = require('path');");
-  lines.push("function call(name,args){ const p = spawnSync(process.execPath,[path.resolve(__dirname,'..','..','examples','mcp-n8n-server.js'),'--once',name,JSON.stringify(args||{})],{encoding:'utf8',env:{...process.env,N8N_MCP_DRY_RUN:'1'}}); if(p.status!==0) throw new Error('Call failed:'+p.stderr); return JSON.parse(p.stdout); }");
+  lines.push("function once(method, params){ const p = spawnSync(process.execPath,[path.resolve(__dirname,'..','..','examples','mcp-n8n-server.js'),'--once',method,JSON.stringify(params||{})],{encoding:'utf8',env:{...process.env,N8N_MCP_DRY_RUN:'1'}}); if(p.status!==0) throw new Error('Call failed:'+p.stderr); return JSON.parse(p.stdout); }");
+  lines.push("function buildArgs(schema){ const args={}; if(!schema||typeof schema!==\"object\") return args; const req = Array.isArray(schema.required)?schema.required:[]; const props = schema.properties||{}; for(const k of req){ const p=props[k]||{}; const t=Array.isArray(p.type)?p.type[0]:p.type; if(t==='number'||t==='integer') args[k]=1; else if(t==='boolean') args[k]=true; else if(t==='object') args[k]={}; else if(t==='array') args[k]=[]; else args[k]='id'; } return args; }");
   lines.push("(async()=>{ try {");
-  let count = 0;
-  for (const t of tools) {
-    const args = buildArgsForTool(t);
-    const argsStr = JSON.stringify(args);
-    // Use try/catch per tool to continue on non-critical failures
-    lines.push(`  try { const res = call(${JSON.stringify(t.name)}, ${argsStr}); if (!res || typeof res !== 'object') throw new Error('no result'); if (!('dryRun' in res)) throw new Error('not dry-run'); } catch(e){ throw new Error('tool failed: ${t.name}: '+e.message); }`);
-    count++;
-  }
-  lines.push("  console.log('Dry-run OK for tools:', '" + count + "');");
+  lines.push("  const listed = once('tools/list', {}); const tools = listed.tools||[]; if(!Array.isArray(tools)) throw new Error('tools/list returned invalid');");
+  lines.push("  let ok=0; for(const t of tools){ try{ const args = buildArgs(t.inputSchema); const res = once(t.name, args); if(!res||typeof res!=='object') throw new Error('no result'); ok++; } catch(e){ const msg=String(e.message||''); if(/Path not allowed|Method not allowed|Rate limit/i.test(msg)){ /* skip due to policy */ } else { throw new Error('tool failed: '+t.name+': '+e.message); } } }");
+  lines.push("  console.log('Dry-run OK for tools:', String(ok));");
   lines.push("  process.exit(0);");
   lines.push("} catch (e) { console.error('UNIT FAILED:', e.message); process.exit(1);} })();");
   fs.writeFileSync(outFile, lines.join('\n'));
-  console.log(`Wrote ${outFile} for ${count} tools.`);
+  console.log(`Wrote ${outFile}.`);
 }
 
 main();

@@ -296,7 +296,7 @@ try {
   const SPEC_URL = process.env.OPENAPI_SPEC_URL || '';
   const OPENAPI_BASE_URL = process.env.OPENAPI_BASE_URL || process.env.N8N_API_URL || '';
   if (SPEC_FILE || SPEC_URL) {
-    const { generateMcpTools } = require('../universal-openapi-mcp-generator');
+    const { generateMcpTools } = require('../lib/openapi-generator');
 
     async function loadOpenApiSpec() {
       if (SPEC_FILE) {
