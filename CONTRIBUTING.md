@@ -1,10 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing! This project aims to integrate MCP server and CLI utilities for n8n.
-
-For upstreaming to n8n, please follow the official guidelines:
-
-- n8n contribution guidelines: https://github.com/n8n-io/n8n/blob/master/CONTRIBUTING.md
+Thanks for your interest in contributing! This project aims to globally integrate MCP server and CLI utilities.
 
 Local development
 
