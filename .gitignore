@@ -9,6 +9,7 @@ yarn-error.log*
 .env
 .env.*.local
 .npm-cache/
+.npmrc
 
 # Artifacts
 *.tgz

@@ -6,3 +6,4 @@ data/
 .npm-cache/
 .github/
 examples/generated/
+.npmrc
