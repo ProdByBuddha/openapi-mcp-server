@@ -2,6 +2,18 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
+1.2.1 - 2025-08-19
+- Add support for building and publishing the GitHub wiki.
+- Enhance wiki styling and add support/donation links.
+- Rename OpenAPI generator CLI to `generate-openapi-mcp-tools.js`.
+- Update documentation and examples.
+
+1.2.0 - 2025-08-19
+- Rename package to `@prodbybuddha/openapi-mcp-server` to reflect generalized scope.
+- Make generic OpenAPI server the primary entry point.
+- Keep n8n-specific server available under `examples/mcp-n8n-server.js`.
+- Update exports, README, and repository links.
+
 1.1.1 - 2025-08-19
 - Publish under scoped name `@prodbybuddha/n8n-mcp-server` on npm.
 - Update README imports to use scoped path export.
@@ -16,8 +28,3 @@ All notable changes to this project will be documented in this file.
 
 1.0.0 - 2025-08-19
 - Initial release of n8n MCP server with example CLI and tests.
-1.2.0 - 2025-08-19
-- Rename package to `@prodbybuddha/openapi-mcp-server` to reflect generalized scope.
-- Make generic OpenAPI server the primary entry point.
-- Keep n8n-specific server available under `examples/mcp-n8n-server.js`.
-- Update exports, README, and repository links.
