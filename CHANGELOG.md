@@ -28,7 +28,7 @@ All notable changes to this project will be documented in this file.
 
 1.0.0 - 2025-08-19
 - Initial release of n8n MCP server with example CLI and tests.
-## 1.3.0 - 2025-08-19
+1.3.0 - 2025-08-19
 
 ### Added
 - WebSocket transport for generated servers (`--transport ws`), template now depends on `ws`.
