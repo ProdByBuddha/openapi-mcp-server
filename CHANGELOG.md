@@ -2,7 +2,7 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
-1.3.1 - 2025-08-20
+1.3.0 - 2025-08-20
 
 ### Added
 - GitHub Actions workflow: auto-build and publish the GitHub Wiki on docs/spec changes, releases, and manual dispatch (`.github/workflows/update-wiki.yml`).
