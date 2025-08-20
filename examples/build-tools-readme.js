@@ -51,13 +51,22 @@ function buildMarkdown(tools) {
 }
 
 function main() {
-  const jsonPath = process.argv[2] || path.resolve(__dirname, 'generated', 'n8n-openapi-tools.json');
+  const n8nToolsPath = path.resolve(__dirname, 'generated', 'n8n-openapi-tools.json');
+  const hostingerToolsPath = path.resolve(__dirname, 'generated', 'hostinger-openapi-tools.json');
   const outPath = process.argv[3] || path.resolve(__dirname, 'generated', 'TOOLS.md');
-  const tools = loadTools(jsonPath);
-  const md = buildMarkdown(tools);
+
+  let allTools = [];
+  if (fs.existsSync(n8nToolsPath)) {
+    allTools = allTools.concat(loadTools(n8nToolsPath));
+  }
+  if (fs.existsSync(hostingerToolsPath)) {
+    allTools = allTools.concat(loadTools(hostingerToolsPath));
+  }
+
+  const md = buildMarkdown(allTools);
   fs.mkdirSync(path.dirname(outPath), { recursive: true });
   fs.writeFileSync(outPath, md);
-  console.log(`Wrote ${outPath} (${tools.length} tools)`);
+  console.log(`Wrote ${outPath} (${allTools.length} tools)`);
 }
 
 main();
