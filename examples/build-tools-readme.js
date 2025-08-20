@@ -17,9 +17,21 @@ function groupByTag(tools) {
   const groups = new Map();
   for (const t of tools) {
     const name = t.name || '';
-    const parts = String(name).split('.');
-    // Expect: n8n.vX.Tag.operation
-    const tag = parts.length >= 3 ? parts[2] : 'api';
+    let tag = 'api'; // Default tag
+
+    // Try to extract tag from n8n-style names
+    const n8nParts = String(name).split('.');
+    if (n8nParts.length >= 3 && n8nParts[0] === 'n8n') {
+      tag = n8nParts[2];
+    } else {
+      // Try to extract tag from Hostinger/Docker-style names
+      const hostingerParts = String(name).split('_');
+      if (hostingerParts.length >= 2) {
+        // Take the first part and capitalize it
+        tag = hostingerParts[0].charAt(0).toUpperCase() + hostingerParts[0].slice(1);
+      }
+    }
+
     if (!groups.has(tag)) groups.set(tag, []);
     groups.get(tag).push(t);
   }
