@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2025-08-19T22:30:14.048Z",
+  "tools": [
+    {
+      "name": "deleteCredential",
+      "description": "Delete credential by ID",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The credential ID that needs to be deleted"
+          },
+          "X-N8N-API-KEY": {
+            "type": "string",
+            "description": "API Key for ApiKeyAuth"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "method": "DELETE",
+      "pathTemplate": "/credentials/{id}"
+    }
+  ]
+}

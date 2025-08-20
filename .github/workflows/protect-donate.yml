@@ -1,0 +1,20 @@
+name: Protect donate.json
+
+on:
+  pull_request:
+    paths:
+      - 'donate.json'
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check actor permission for donate.json changes
+        run: |
+          echo "Actor: ${{ github.actor }}"
+          echo "Owner: ${{ vars.OWNER_ACTOR || 'ProdByBuddha' }}"
+          if [ "${{ github.actor }}" != "${{ vars.OWNER_ACTOR || 'ProdByBuddha' }}" ]; then
+            echo "Unauthorized attempt to modify donate.json by ${{ github.actor }}" >&2
+            exit 1
+          fi

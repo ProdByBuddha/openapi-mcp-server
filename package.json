@@ -1,0 +1,91 @@
+{
+  "name": "@prodbybuddha/openapi-mcp-server",
+  "version": "1.3.0",
+  "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
+  "main": "examples/mcp-openapi-server.js",
+  "exports": {
+    ".": "./examples/mcp-openapi-server.js",
+    "./lib/openapi-generator": "./lib/openapi-generator/index.js",
+    "./examples/mcp-n8n-server": "./examples/mcp-n8n-server.js"
+  },
+  "files": [
+    "lib",
+    "examples",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "node examples/mcp-n8n-server.js",
+    "test": "node tests/run-all.js",
+    "test:all": "npm run test",
+    "dev": "nodemon examples/mcp-n8n-server.js",
+    "n8n:list": "node examples/n8n-workflows-cli.js list",
+    "n8n:get": "node examples/n8n-workflows-cli.js get",
+    "n8n:export": "node examples/n8n-workflows-cli.js export",
+    "n8n:update": "node examples/n8n-workflows-cli.js update",
+    "n8n:dump": "node examples/n8n-workflows-cli.js dump-all",
+    "n8n:activate": "node examples/n8n-workflows-cli.js activate",
+    "n8n:deactivate": "node examples/n8n-workflows-cli.js deactivate",
+    "mcp:n8n": "node examples/mcp-n8n-server.js",
+    "mcp:n8n:once": "node examples/mcp-n8n-server.js --once",
+    "mcp:openapi": "node examples/mcp-openapi-server.js",
+    "mcp:openapi:once": "node examples/mcp-openapi-server.js --once",
+    "mcp:hostinger": "node examples/mcp-hostinger-server.js",
+    "mcp:hostinger:once": "node examples/mcp-hostinger-server.js --once",
+    "mcp:gen": "node examples/generate-openapi-mcp-tools.js",
+    "mcp:gen:tools": "node examples/generate-openapi-mcp-tools.js",
+    "mcp:gen:server": "node examples/generate-openapi-mcp-tools.js --generate-server --baseUrl \"$OPENAPI_BASE_URL\"",
+    "mcp:tools:readme": "node examples/build-tools-readme.js",
+    "mcp:list-tools": "node examples/mcp-n8n-server.js --once tools/list {}",
+    "openapi:lint": "node examples/lint-openapi.js --file examples/specs/hostinger-api.json",
+    "openapi:lint:all": "node examples/scripts/lint-all-specs.js",
+    "services:merge": "node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json",
+    "services:regen": "npm run openapi:lint:all && node examples/scripts/generate-services-from-specs.js --out examples/services.generated.json && node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json",
+    "services:report": "node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json --strategy report --report-out examples/services.conflicts.json",
+    "services:lint:config": "node examples/scripts/lint-services-config.js --file examples/services.merged.json",
+    "services:regen:report": "npm run openapi:lint:all && node examples/scripts/generate-services-from-specs.js --out examples/services.generated.json && node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json --strategy report --report-out examples/services.conflicts.json && npm run services:lint:config",
+    "donate:print": "node examples/scripts/print-donate.js",
+    "openapi:lint:file": "node examples/lint-openapi.js --file",
+    "docs:wiki": "node scripts/build-wiki.js"
+  },
+  "keywords": [
+    "n8n",
+    "mcp",
+    "model context protocol",
+    "cli",
+    "automation",
+    "openapi"
+  ],
+  "author": "Billy Coleman III",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "swagger-parser": "^10.0.3",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProdByBuddha/openapi-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ProdByBuddha/openapi-mcp-server/issues"
+  },
+  "homepage": "https://github.com/ProdByBuddha/openapi-mcp-server/wiki",
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "funding": {
+    "type": "donation",
+    "url": "https://donate.stripe.com/9AQbLka97fFx75K8ww"
+  }
+}
