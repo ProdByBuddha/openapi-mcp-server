@@ -85,6 +85,10 @@ function main() {
   const cocSrc = path.join(root, 'CODE_OF_CONDUCT.md');
   if (copyIfExists(cocSrc, path.join(tmp, 'Code-of-Conduct.md'))) pages.push('Code-of-Conduct.md');
 
+  // Vibe.md (non-technical intro)
+  const vibeSrc = path.join(root, 'VIBE.md');
+  if (copyIfExists(vibeSrc, path.join(tmp, 'Vibe.md'))) pages.push('Vibe.md');
+
   if (pages.length === 0) {
     console.log('No pages to update.');
     process.exit(0);
@@ -98,7 +102,8 @@ function main() {
       ['Changelog', 'Changelog'],
       ['Security', 'Security'],
       ['Contributing', 'Contributing'],
-      ['Code of Conduct', 'Code-of-Conduct']
+      ['Code of Conduct', 'Code-of-Conduct'],
+      ['Vibe', 'Vibe']
     ];
     const helpfulLinks = [
       ['🚀 WisprFlow AI (affiliate)', 'https://wisprflow.ai/r/BILLY53']
@@ -114,7 +119,8 @@ function main() {
       'Changelog': '📝',
       'Security': '🔐',
       'Contributing': '🤝',
-      'Code of Conduct': '📜'
+      'Code of Conduct': '📜',
+      'Vibe': '🎵'
     };
     for (const [title, page] of sidebarItems) {
       const p = path.join(tmp, page + '.md');
