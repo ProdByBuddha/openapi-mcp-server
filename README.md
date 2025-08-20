@@ -25,7 +25,7 @@ No credentials are stored; set env vars when running.
 This project provides comprehensive documentation to help you get started and make the most of its features:
 
 *   **[Main README.md](README.md):** You are here! This file provides a quick overview and essential setup instructions.
-*   **[For "Vibe Coders"](@VIBE.md):** A simplified, non-technical introduction to the project's value and utility.
+*   **[For "Vibe Coders"](VIBE.md):** A simplified, non-technical introduction to the project's value and utility.
 *   **[GitHub Wiki](https://github.com/ProdByBuddha/openapi-mcp-server/wiki):** The most comprehensive and navigable source of documentation. It's automatically built and kept up-to-date from the project's source Markdown files, offering detailed guides, examples, and how-tos.
 
 ## Support
