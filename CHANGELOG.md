@@ -2,6 +2,22 @@ Changelog
 
 All notable changes to this project will be documented in this file.
 
+1.3.1 - 2025-08-20
+
+### Added
+- GitHub Actions workflow: auto-build and publish the GitHub Wiki on docs/spec changes, releases, and manual dispatch (`.github/workflows/update-wiki.yml`).
+- Spec pipeline: regenerate tools from `examples/specs/*.{json,yaml,yml}` and rebuild `examples/generated/TOOLS.md` before publishing the Wiki.
+- Linting: run `openapi:lint:all` for `specs/**` and lint `examples/specs/*.json` in CI prior to generation.
+- Wiki footer: include a collapsible “Crypto wallets” section populated from `donate.json`.
+- OpenAPI generator: recognize `x-eov-operation-id` (e.g., n8n) when `operationId` is absent, improving tool coverage.
+
+### Changed
+- Wiki builder: include `VIBE.md` in the Wiki and Sidebar navigation.
+- Workflow: removed duplicate early Tools README rebuild step to avoid double work.
+
+### Fixed
+- README: correct link to `VIBE.md` in the Documentation section.
+
 1.2.1 - 2025-08-19
 - Add support for building and publishing the GitHub wiki.
 - Enhance wiki styling and add support/donation links.
