@@ -1,0 +1,71 @@
+{
+  "name": "Spec Gate Badge",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "spec-gate-badge",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const fs = require('fs');\nconst path = '/home/node/.n8n/ci/spec-gate-last-status.txt';\n\nlet status = 'unknown';\nif (fs.existsSync(path)) {\n  status = fs.readFileSync(path, 'utf-8').trim();\n}\n\nlet color;\nswitch(status) {\n  case 'passing': color = 'brightgreen'; break;\n  case 'failing': color = 'red'; break;\n  default: color = 'lightgrey';\n}\n\nreturn {\n  json: {\n    schemaVersion: 1,\n    label: 'spec gate',\n    message: status,\n    color: color,\n    link: 'https://github.com/ProdByBuddha/openapi-mcp-server/releases/latest'\n  }\n};"
+      },
+      "name": "Last Status",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "responseMode": "lastNode",
+        "options": {
+          "responseData": "json"
+        }
+      },
+      "name": "Respond Badge",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        750,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Last Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Last Status": {
+      "main": [
+        [
+          {
+            "node": "Respond Badge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

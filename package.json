@@ -46,7 +46,13 @@
     "services:regen:report": "npm run openapi:lint:all && node examples/scripts/generate-services-from-specs.js --out examples/services.generated.json && node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json --strategy report --report-out examples/services.conflicts.json && npm run services:lint:config",
     "donate:print": "node examples/scripts/print-donate.js",
     "openapi:lint:file": "node examples/lint-openapi.js --file",
-    "docs:wiki": "node scripts/build-wiki.js"
+    "docs:wiki": "node scripts/build-wiki.js",
+    "openapi:spec-gate": "node examples/scripts/spec-gate.js",
+    "openapi:spec-gate:all": "node examples/scripts/spec-gate.js --dir specs && node examples/scripts/spec-gate.js --dir examples/specs",
+    "openapi:spec-gate:hostinger": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3",
+    "openapi:spec-gate:domains": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags Domains",
+    "openapi:spec-gate:vps": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags VPS",
+    "openapi:spec-gate:dns": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags DNS"
   },
   "keywords": [
     "n8n",

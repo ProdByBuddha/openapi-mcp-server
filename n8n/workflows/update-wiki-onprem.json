@@ -1,0 +1,113 @@
+{
+  "name": "Update Wiki (On‑Prem)",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "update-wiki",
+        "options": {
+          "responseMode": "responseNode",
+          "responseCode": 200
+        }
+      },
+      "id": "Webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [260, 200]
+    },
+    {
+      "parameters": {
+        "path": "gh-wiki",
+        "options": { "responseMode": "onReceived" }
+      },
+      "id": "Webhook GitHub Docs",
+      "name": "Webhook GitHub Docs",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [260, 60]
+    },
+    {
+      "parameters": {
+        "command": "sh -lc 'set -eu\nCI_DIR=\"${N8N_CI_DIR:-${N8N_USER_FOLDER:-/home/node/.n8n}/ci}\"\nmkdir -p \"$CI_DIR\"\nREPO_DIR=\"$CI_DIR/openapi-mcp-server\"\nif [ -d \"$REPO_DIR/.git\" ]; then\n  git -C \"$REPO_DIR\" fetch --all --prune || true\n  git -C \"$REPO_DIR\" reset --hard origin/main || true\nelse\n  git clone https://github.com/ProdByBuddha/openapi-mcp-server.git \"$REPO_DIR\" || true\nfi\ncd \"$REPO_DIR\"\nnpm ci\nnpm run mcp:tools:readme\nnpm run docs:wiki'",
+        "options": {
+          "continueOnFail": false
+        }
+      },
+      "id": "Publish Wiki",
+      "name": "Publish Wiki",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [540, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            { "value1": "={{$json[\"stderr\"]}}", "operation": "contains", "value2": "npm ERR!" }
+          ]
+        }
+      },
+      "id": "Wiki Failed?",
+      "name": "Wiki Failed?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [800, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.SLACK_WEBHOOK_URL}}",
+        "options": {},
+        "method": "POST",
+        "sendBody": true,
+        "jsonParameters": true,
+        "bodyParametersJson": "={\"text\": \"Wiki update failed: {{$json.stderr}}\"}"
+      },
+      "id": "Wiki Slack",
+      "name": "Wiki Slack",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1060, 120]
+    },
+    {
+      "parameters": {
+        "url": "={{$env.DISCORD_WEBHOOK_URL}}",
+        "options": {},
+        "method": "POST",
+        "sendBody": true,
+        "jsonParameters": true,
+        "bodyParametersJson": "={\"content\": \"Wiki update failed: {{$json.stderr}}\"}"
+      },
+      "id": "Wiki Discord",
+      "name": "Wiki Discord",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [1060, 280]
+    },
+    {
+      "parameters": {
+        "responseBody": "={\"ok\": true, \"message\": \"Wiki updated\"}",
+        "responseCode": 200
+      },
+      "id": "Respond",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [820, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [ [ { "node": "Publish Wiki", "type": "main", "index": 0 } ] ] },
+    "Webhook GitHub Docs": { "main": [ [ { "node": "Publish Wiki", "type": "main", "index": 0 } ] ] },
+    "Publish Wiki": { "main": [ [ { "node": "Wiki Failed?", "type": "main", "index": 0 } ] ] },
+    "Wiki Failed?": {
+      "main": [
+        [ { "node": "Wiki Slack", "type": "main", "index": 0 }, { "node": "Wiki Discord", "type": "main", "index": 0 } ],
+        [ { "node": "Respond", "type": "main", "index": 0 } ]
+      ]
+    },
+    "Wiki Slack": { "main": [ [ { "node": "Respond", "type": "main", "index": 0 } ] ] },
+    "Wiki Discord": { "main": [ [ { "node": "Respond", "type": "main", "index": 0 } ] ] }
+  },
+  "active": false,
+  "settings": {}
+}

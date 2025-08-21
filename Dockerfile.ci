@@ -1,0 +1,8 @@
+FROM node:lts-alpine
+
+RUN apk add --no-cache git openssh-client bash
+WORKDIR /work
+
+# Default command prints help
+CMD ["bash", "-lc", "echo 'Mount repo to /work; run scripts/ci-spec-gate.sh' && ls -la"]
+

@@ -3,6 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@prodbybuddha/openapi-mcp-server?logo=npm&color=cb0000)](https://www.npmjs.com/package/@prodbybuddha/openapi-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ProdByBuddha/openapi-mcp-server?sort=semver)](https://github.com/ProdByBuddha/openapi-mcp-server/releases)
+[![Spec Gate](https://img.shields.io/endpoint?url=https://your-n8n/webhook/spec-gate-badge)](#spec-gate-conformance--fuzz)
 
 Generic OpenAPI → MCP tool server with first‑class Docker, n8n & Hostinger integrations. It can:
 - Load any OpenAPI 3.x spec and generate MCP tools on the fly
@@ -229,11 +230,35 @@ Set environment variables directly or via `.env` (see `.env.example`):
   - Generates tools, calls the MCP server over stdio, and asserts workflows can be listed.
 - Auto-generated unit tests: The test runner creates a dry-run unit test for every OpenAPI tool and executes it (no network).
 
+## Spec Gate (Conformance + Fuzz)
+
+Validate specs structurally and then fuzz each operation with randomized, no-network dry runs. Catches missing params, bad path templates, enum/constraints issues early and reinforces the “no errors if the host spec is good” promise.
+
+- Run all local specs:
+  - `npm run openapi:spec-gate:all`
+- Single file:
+  - `node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3`
+- Tag filters:
+  - `node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags Domains`
+- Operation/path filters:
+  - `--include-ops domains_getDomainListV1,domains_getDomainDetailsV1`
+  - `--include-paths-re "/v1/domains/.*"`
+- Optional field probability:
+  - `SPEC_GATE_OPT_PROB=0.6 node examples/scripts/spec-gate.js --file ... --runs 3`
+
+Convenience scripts:
+- `npm run openapi:spec-gate:hostinger`
+- `npm run openapi:spec-gate:domains`
+- `npm run openapi:spec-gate:dns`
+- `npm run openapi:spec-gate:vps`
+
 ## CI (optional)
 
 The repo includes sample GitHub Actions workflows (in `.github/workflows/`):
 - `CI`: installs deps and runs tests. E2E runs only if repo secrets are configured.
 - `Update Generated MCP Tools`: regenerates OpenAPI tools on a schedule or manual dispatch.
+
+For on‑prem CI with n8n workers, see `docs/ONPREM-CI.md`.
 
 Tip: In your fork, set `N8N_API_URL` and `N8N_API_KEY` repository secrets to enable E2E in CI and auto‑update the generated tools.
 
