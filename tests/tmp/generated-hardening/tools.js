@@ -157,7 +157,7 @@ async function genericHandler(serializationInfo, args) {
     }
   }
 
-  const resolvedBaseUrl = process.env.OPENAPI_BASE_URL || 'http://localhost:4555';
+  const resolvedBaseUrl = process.env.OPENAPI_BASE_URL || 'http://localhost:4556';
   let resolvedPath = path;
   const requestQuery = {};
   const requestHeaders = {};

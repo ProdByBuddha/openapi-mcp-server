@@ -1,7 +1,7 @@
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 
 const { generateMcpServer } = require('../../lib/openapi-generator/server-generator');
 
@@ -20,6 +20,7 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
     const outDir = path.resolve(__dirname, '..', 'tmp', 'generated-union');
     fs.rmSync(outDir, { recursive: true, force: true });
     await generateMcpServer(spec, outDir, { baseUrl: 'http://localhost:4556' });
+    execSync('npm install', { cwd: outDir, stdio: 'inherit' });
 
     // Ensure generated server policy allows our test routes
     process.env.OPENAPI_MCP_ALLOWED_PATHS = '/union-*';

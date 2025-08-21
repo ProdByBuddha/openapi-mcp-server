@@ -1,7 +1,7 @@
 // Minimal test runner: executes all *.test.js in this folder sequentially
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { spawnSync, execSync } = require('child_process');
 let dotenv;
 try { dotenv = require('dotenv'); } catch (_) { dotenv = null; }
 
@@ -54,6 +54,16 @@ if (!fs.existsSync(toolsJson) && process.env.N8N_API_URL && process.env.N8N_API_
   console.log('Generating tools JSON...');
   const gen = spawnSync(process.execPath, [path.resolve(__dirname, '..', 'examples', 'generate-openapi-mcp-tools.js'), '--from-url', String(process.env.N8N_API_URL).replace(/\$/, '') + '/docs/swagger-ui-init.js', '--out', toolsJson], { stdio: 'inherit', env: process.env });
   if (gen.status !== 0) process.exit(gen.status);
+}
+
+// Setup test servers dependencies
+const tmpDir = path.resolve(__dirname, 'tmp');
+if (fs.existsSync(tmpDir)) {
+  const pkgJson = path.join(tmpDir, 'package.json');
+  const pkg = { "name": "tmp-servers", "version": "1.0.0", "dependencies": { "express": "^4.17.1" } };
+  fs.writeFileSync(pkgJson, JSON.stringify(pkg, null, 2));
+  console.log('Installing test server dependencies in tests/tmp...');
+  execSync('npm install', { cwd: tmpDir, stdio: 'inherit' });
 }
 
 // Generate unit tests from tools JSON (dry-run mode)

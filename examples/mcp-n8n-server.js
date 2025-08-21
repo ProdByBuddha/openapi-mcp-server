@@ -302,7 +302,18 @@ try {
     async function loadOpenApiSpec() {
       if (SPEC_FILE) {
         const raw = fs.readFileSync(path.resolve(process.cwd(), SPEC_FILE), 'utf8');
-        try { return JSON.parse(raw); } catch (_) { throw new Error('OPENAPI_SPEC_FILE must be JSON'); }
+        try {
+          // Try JSON first
+          return JSON.parse(raw);
+        } catch (_) {
+          // Try YAML
+          try {
+            const YAML = require('yaml');
+            return YAML.parse(raw);
+          } catch (_) {
+            throw new Error('OPENAPI_SPEC_FILE must be a valid JSON or YAML file');
+          }
+        }
       }
       // SPEC_URL path
       await new Promise((resolve) => setImmediate(resolve)); // yield
@@ -322,8 +333,15 @@ try {
             res.setEncoding('utf8');
             res.on('data', (c) => (body += c));
             res.on('end', () => {
-              try { resolve(JSON.parse(body)); }
-              catch (err) { reject(new Error('OPENAPI_SPEC_URL did not return JSON')); }
+              // Try JSON first
+              try { resolve(JSON.parse(body)); return; } catch (_) {}
+              // Try YAML if available
+              try {
+                const YAML = require('yaml');
+                resolve(YAML.parse(body));
+                return;
+              } catch (_) {}
+              reject(new Error('OPENAPI_SPEC_URL did not return a parseable spec (JSON/YAML)'));
             });
           });
           req.on('error', reject);

@@ -1,7 +1,7 @@
 const assert = require('assert');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
+const { spawn, execSync } = require('child_process');
 
 const { generateMcpServer } = require('../../lib/openapi-generator/server-generator');
 
@@ -18,7 +18,8 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
     const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
     const outDir = path.resolve(__dirname, '..', 'tmp', 'generated-hardening');
     fs.rmSync(outDir, { recursive: true, force: true });
-    await generateMcpServer(spec, outDir, { baseUrl: 'http://localhost:4555' });
+    await generateMcpServer(spec, outDir, { baseUrl: 'http://localhost:4556' });
+    execSync('npm install', { cwd: outDir, stdio: 'inherit' });
     const toolsPath = path.join(outDir, 'tools.js');
 
     // Helper to load tools with fresh policy env
