@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * Minimal Node-based MCP-like JSON-RPC server for n8n
  * - Exposes a generic n8n.request tool for any REST call

@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * Generic OpenAPI → MCP tool server
  * - Loads an OpenAPI 3.x spec (file or URL)

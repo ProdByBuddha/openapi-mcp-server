@@ -3,6 +3,10 @@
   "version": "1.3.1",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-openapi-server.js",
+  "bin": {
+    "openapi-mcp-server": "./examples/mcp-openapi-server.js",
+    "n8n-mcp-server": "./examples/mcp-n8n-server.js"
+  },
   "exports": {
     ".": "./examples/mcp-openapi-server.js",
     "./lib/openapi-generator": "./lib/openapi-generator/index.js",
