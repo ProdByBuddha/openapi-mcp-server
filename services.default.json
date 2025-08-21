@@ -1,0 +1,17 @@
+{
+  "services": [
+    {
+      "name": "petstore",
+      "type": "openapi",
+      "specUrl": "https://petstore3.swagger.io/api/v3/openapi.json",
+      "baseUrl": "https://petstore3.swagger.io/api/v3",
+      "auth": {
+        "kind": "apiKey",
+        "in": "header",
+        "name": "api_key",
+        "env": "PETSTORE_API_KEY"
+      },
+      "filters": {}
+    }
+  ]
+}

@@ -2,19 +2,19 @@
   "name": "@prodbybuddha/openapi-mcp-server",
   "version": "1.3.3",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
-  "main": "examples/mcp-openapi-server.js",
+  "main": "examples/mcp-multi-host.js",
   "bin": {
-    "openapi-mcp-server": "./examples/mcp-openapi-server.js",
-    "n8n-mcp-server": "./examples/mcp-n8n-server.js"
+    "openapi-mcp-server": "./examples/mcp-multi-host.js"
   },
   "exports": {
-    ".": "./examples/mcp-openapi-server.js",
+    ".": "./examples/mcp-multi-host.js",
     "./lib/openapi-generator": "./lib/openapi-generator/index.js",
-    "./examples/mcp-n8n-server": "./examples/mcp-n8n-server.js"
+    "./examples/mcp-multi-host": "./examples/mcp-multi-host.js"
   },
   "files": [
     "lib",
     "examples",
+    "services.default.json",
     "README.md",
     "LICENSE"
   ],
