@@ -1468,6 +1468,11 @@
       }
     },
     "/variables/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/variableId"
+        }
+      ],
       "delete": {
         "x-eov-operation-id": "deleteVariable",
         "x-eov-operation-handler": "v1/handlers/variables/variables.handler",
@@ -1476,11 +1481,6 @@
         ],
         "summary": "Delete a variable",
         "description": "Delete a variable from your instance.",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/variableId"
-          }
-        ],
         "responses": {
           "204": {
             "description": "Operation successful."
