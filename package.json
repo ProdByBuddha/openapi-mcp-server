@@ -14,6 +14,7 @@
   "files": [
     "lib",
     "examples",
+    "specs",
     "services.default.json",
     "README.md",
     "LICENSE"
