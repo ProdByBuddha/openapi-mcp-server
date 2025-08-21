@@ -28,14 +28,49 @@ function parseArgs(argv){ const o={}; for(let i=0;i<argv.length;i++){ const t=ar
 
 async function httpGetJson(urlString, headers = {}) {
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`Request timeout after 10 seconds for ${urlString}`));
+    }, 10000);
+
     try {
       const u = new URL(urlString);
       const lib = u.protocol === 'https:' ? https : http;
-      const req = lib.request({ protocol: u.protocol, hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80), path: u.pathname + u.search, method: 'GET', headers: Object.assign({ Accept: 'application/json' }, headers) }, (res) => {
-        let body = ''; res.setEncoding('utf8'); res.on('data', (c)=> body+=c); res.on('end',()=>{ try{ resolve(JSON.parse(body)); } catch(e){ reject(new Error('Non-JSON response')); } });
+      const req = lib.request({ 
+        protocol: u.protocol, 
+        hostname: u.hostname, 
+        port: u.port || (u.protocol === 'https:' ? 443 : 80), 
+        path: u.pathname + u.search, 
+        method: 'GET', 
+        timeout: 10000,
+        headers: Object.assign({ Accept: 'application/json, application/yaml' }, headers) 
+      }, (res) => {
+        clearTimeout(timeout);
+        let body = ''; 
+        res.setEncoding('utf8'); 
+        res.on('data', (c)=> body+=c); 
+        res.on('end',()=>{ 
+          // Try JSON first
+          try { resolve(JSON.parse(body)); return; } catch (_) {}
+          // Try YAML if available
+          try { const YAML = require('yaml'); resolve(YAML.parse(body)); return; } catch (_) {}
+          // If neither works, reject with more specific error
+          reject(new Error(`Response is not valid JSON or YAML. Content-Type: ${res.headers['content-type']}, Status: ${res.statusCode}`));
+        });
       });
-      req.on('error', reject); req.end();
-    } catch (err) { reject(err); }
+      req.on('error', (err) => {
+        clearTimeout(timeout);
+        reject(err);
+      });
+      req.on('timeout', () => {
+        clearTimeout(timeout);
+        req.destroy();
+        reject(new Error(`Request timeout for ${urlString}`));
+      });
+      req.end();
+    } catch (err) { 
+      clearTimeout(timeout);
+      reject(err); 
+    }
   });
 }
 
@@ -89,7 +124,7 @@ async function loadService(entry, allTools) {
       // prefix tool names with service name to avoid collisions
       allTools.push({ name: `${entry.name}.${t.name}`, description: t.description || '', inputSchema: t.inputSchema || { type: 'object' }, handler: t.handler });
     }
-    console.log(`[${entry.name}] Loaded ${tools.length} tools`);
+    console.error(`[${entry.name}] Loaded ${tools.length} tools`);
   } catch (error) {
     console.warn(`[${entry.name}] Failed to load service: ${error.message}`);
   }
@@ -102,15 +137,19 @@ async function callToolByName(name, args){ const tool = tools.find((t)=>t.name==
 function writeResponse(id, result, error){ const msg={jsonrpc:'2.0',id}; if(error) msg.error=error; else msg.result=result; process.stdout.write(JSON.stringify(msg)+'\n'); }
 function toRpcError(err){ return { code: -32000, message: err.message || 'Request failed', data: err.response || null }; }
 
-async function main(){
+async function loadServices(){
   const args = parseArgs(process.argv.slice(2));
-  const cfgPath = args.config || path.join(__dirname, '..', 'services.default.json');
+  const cfgPath = args.config || process.argv[2] || path.join(__dirname, '..', 'services.default.json');
   const fullCfgPath = path.resolve(cfgPath);
   process.chdir(path.dirname(fullCfgPath));
   const cfg = JSON.parse(fs.readFileSync(fullCfgPath, 'utf8'));
   const entries = Array.isArray(cfg.services) ? cfg.services : [];
   if (!entries.length) { console.error('No services in config'); process.exit(1); }
   for (const entry of entries) { await loadService(entry, tools); }
+}
+
+async function main(){
+  const args = parseArgs(process.argv.slice(2));
   const transport = (args.transport || 'stdio').toLowerCase();
   if (transport === 'http') {
     const app = express();
@@ -183,4 +222,39 @@ async function main(){
   }
 }
 
-main().catch((e)=>{ console.error('Fatal:', e.message); process.exit(1); });
+async function maybeOnce() {
+  const args = process.argv.slice(2);
+  const onceIndex = args.indexOf('--once');
+  if (onceIndex === -1) return false;
+  
+  const method = args[onceIndex + 1];
+  const params = args[onceIndex + 2] ? JSON.parse(args[onceIndex + 2]) : {};
+  
+  try {
+    if (method === 'tools/list') { 
+      console.log(JSON.stringify(listToolsResponse(), null, 2)); 
+      return true; 
+    }
+    if (method === 'tools/call') {
+      const result = await callToolByName(params?.name, params?.arguments || {});
+      console.log(JSON.stringify(result, null, 2));
+      return true;
+    }
+    throw new Error(`Unknown method: ${method}`);
+  } catch (err) {
+    console.error('Error:', err.message);
+    process.exitCode = 1;
+    return true;
+  }
+}
+
+(async () => {
+  // Always load services first
+  await loadServices();
+  
+  // Then check if this is a --once call
+  if (await maybeOnce()) return;
+  
+  // Otherwise run the main transport loop
+  await main();
+})().catch((e)=>{ console.error('Fatal:', e.message); process.exit(1); });
