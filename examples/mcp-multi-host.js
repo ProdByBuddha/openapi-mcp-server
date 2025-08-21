@@ -35,20 +35,30 @@ async function httpGetJson(urlString, headers = {}) {
     try {
       const u = new URL(urlString);
       const lib = u.protocol === 'https:' ? https : http;
-      const req = lib.request({ 
-        protocol: u.protocol, 
-        hostname: u.hostname, 
-        port: u.port || (u.protocol === 'https:' ? 443 : 80), 
-        path: u.pathname + u.search, 
-        method: 'GET', 
+      const req = lib.request({
+        protocol: u.protocol,
+        hostname: u.hostname,
+        port: u.port || (u.protocol === 'https:' ? 443 : 80),
+        path: u.pathname + u.search,
+        method: 'GET',
         timeout: 10000,
-        headers: Object.assign({ Accept: 'application/json, application/yaml' }, headers) 
+        headers: Object.assign({ Accept: 'application/json, application/yaml, text/javascript, application/javascript' }, headers)
       }, (res) => {
         clearTimeout(timeout);
-        let body = ''; 
-        res.setEncoding('utf8'); 
-        res.on('data', (c)=> body+=c); 
-        res.on('end',()=>{ 
+        let body = '';
+        res.setEncoding('utf8');
+        res.on('data', (c)=> body+=c);
+        res.on('end',()=>{
+          if (urlString.endsWith('.js')) {
+            try {
+              const jsonp = body.substring(body.indexOf('{'), body.lastIndexOf('}') + 1);
+              resolve(JSON.parse(jsonp));
+              return;
+            } catch (e) {
+              reject(new Error(`Failed to parse JSON from JS file: ${e.message}`));
+              return;
+            }
+          }
           // Try JSON first
           try { resolve(JSON.parse(body)); return; } catch (_) {}
           // Try YAML if available
@@ -67,9 +77,9 @@ async function httpGetJson(urlString, headers = {}) {
         reject(new Error(`Request timeout for ${urlString}`));
       });
       req.end();
-    } catch (err) { 
+    } catch (err) {
       clearTimeout(timeout);
-      reject(err); 
+      reject(err);
     }
   });
 }
