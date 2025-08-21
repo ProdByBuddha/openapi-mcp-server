@@ -133,6 +133,24 @@ function main() {
     pages.push('_Sidebar.md');
 
     const donationUrl = 'https://donate.stripe.com/9AQbLka97fFx75K8ww';
+    // Build crypto links from donate.json if present
+    let cryptoMd = '';
+    try {
+      const donateJsonPath = path.join(root, 'donate.json');
+      if (fs.existsSync(donateJsonPath)) {
+        const wallets = JSON.parse(fs.readFileSync(donateJsonPath, 'utf8'));
+        const entries = Object.entries(wallets || {});
+        if (entries.length) {
+          cryptoMd += '\n<details>\n<summary><strong>Crypto wallets</strong></summary>\n\n';
+          for (const [chain, addr] of entries) {
+            const label = chain.toUpperCase();
+            cryptoMd += `- ${label}: \`${addr}\`\n`;
+          }
+          cryptoMd += '\n</details>\n';
+        }
+      }
+    } catch (_) {}
+
     const footer = [
       '<div align="center">',
       '',
@@ -141,6 +159,8 @@ function main() {
       `[![Buy Me A Coffee](https://img.shields.io/badge/Support-Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=black)](${donationUrl})`,
       '',
       '</div>',
+      '',
+      cryptoMd,
       ''
     ].join('\n');
     fs.writeFileSync(path.join(tmp, '_Footer.md'), footer);

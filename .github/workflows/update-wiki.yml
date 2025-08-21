@@ -29,7 +29,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  spec-gate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: [Domains, DNS, VPS]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Spec Gate (${{ matrix.tag }})
+        run: node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags "${{ matrix.tag }}"
+
   build-and-publish:
+    needs: spec-gate
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,6 +89,9 @@ jobs:
             echo "Linting example spec $f"
             node examples/lint-openapi.js --file "$f"
           done
+
+      - name: Spec Gate (conformance + fuzz, no network)
+        run: npm run openapi:spec-gate:all
 
       - name: Regenerate tools from local specs
         run: |

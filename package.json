@@ -1,16 +1,21 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.3.0",
+  "version": "1.3.10",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
-  "main": "examples/mcp-openapi-server.js",
+  "main": "examples/mcp-multi-host.js",
+  "bin": {
+    "openapi-mcp-server": "./examples/mcp-multi-host.js"
+  },
   "exports": {
-    ".": "./examples/mcp-openapi-server.js",
+    ".": "./examples/mcp-multi-host.js",
     "./lib/openapi-generator": "./lib/openapi-generator/index.js",
-    "./examples/mcp-n8n-server": "./examples/mcp-n8n-server.js"
+    "./examples/mcp-multi-host": "./examples/mcp-multi-host.js"
   },
   "files": [
     "lib",
     "examples",
+    "specs",
+    "services.default.json",
     "README.md",
     "LICENSE"
   ],
@@ -46,7 +51,13 @@
     "services:regen:report": "npm run openapi:lint:all && node examples/scripts/generate-services-from-specs.js --out examples/services.generated.json && node examples/scripts/merge-services.js --base examples/services.example.json --add examples/services.generated.json --out examples/services.merged.json --strategy report --report-out examples/services.conflicts.json && npm run services:lint:config",
     "donate:print": "node examples/scripts/print-donate.js",
     "openapi:lint:file": "node examples/lint-openapi.js --file",
-    "docs:wiki": "node scripts/build-wiki.js"
+    "docs:wiki": "node scripts/build-wiki.js",
+    "openapi:spec-gate": "node examples/scripts/spec-gate.js",
+    "openapi:spec-gate:all": "node examples/scripts/spec-gate.js --dir specs && node examples/scripts/spec-gate.js --dir examples/specs",
+    "openapi:spec-gate:hostinger": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3",
+    "openapi:spec-gate:domains": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags Domains",
+    "openapi:spec-gate:vps": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags VPS",
+    "openapi:spec-gate:dns": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags DNS"
   },
   "keywords": [
     "n8n",
@@ -62,6 +73,7 @@
     "body-parser": "^2.2.0",
     "express": "^5.1.0",
     "swagger-parser": "^10.0.3",
+    "yaml": "^2.8.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {

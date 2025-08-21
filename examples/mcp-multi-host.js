@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * Multi-service MCP Host (stdio)
  * Loads N+1 services (Hostinger, n8n, arbitrary OpenAPI) into one process.
@@ -27,14 +28,49 @@ function parseArgs(argv){ const o={}; for(let i=0;i<argv.length;i++){ const t=ar
 
 async function httpGetJson(urlString, headers = {}) {
   return new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      reject(new Error(`Request timeout after 10 seconds for ${urlString}`));
+    }, 10000);
+
     try {
       const u = new URL(urlString);
       const lib = u.protocol === 'https:' ? https : http;
-      const req = lib.request({ protocol: u.protocol, hostname: u.hostname, port: u.port || (u.protocol === 'https:' ? 443 : 80), path: u.pathname + u.search, method: 'GET', headers: Object.assign({ Accept: 'application/json' }, headers) }, (res) => {
-        let body = ''; res.setEncoding('utf8'); res.on('data', (c)=> body+=c); res.on('end',()=>{ try{ resolve(JSON.parse(body)); } catch(e){ reject(new Error('Non-JSON response')); } });
+      const req = lib.request({ 
+        protocol: u.protocol, 
+        hostname: u.hostname, 
+        port: u.port || (u.protocol === 'https:' ? 443 : 80), 
+        path: u.pathname + u.search, 
+        method: 'GET', 
+        timeout: 10000,
+        headers: Object.assign({ Accept: 'application/json, application/yaml' }, headers) 
+      }, (res) => {
+        clearTimeout(timeout);
+        let body = ''; 
+        res.setEncoding('utf8'); 
+        res.on('data', (c)=> body+=c); 
+        res.on('end',()=>{ 
+          // Try JSON first
+          try { resolve(JSON.parse(body)); return; } catch (_) {}
+          // Try YAML if available
+          try { const YAML = require('yaml'); resolve(YAML.parse(body)); return; } catch (_) {}
+          // If neither works, reject with more specific error
+          reject(new Error(`Response is not valid JSON or YAML. Content-Type: ${res.headers['content-type']}, Status: ${res.statusCode}`));
+        });
       });
-      req.on('error', reject); req.end();
-    } catch (err) { reject(err); }
+      req.on('error', (err) => {
+        clearTimeout(timeout);
+        reject(err);
+      });
+      req.on('timeout', () => {
+        clearTimeout(timeout);
+        req.destroy();
+        reject(new Error(`Request timeout for ${urlString}`));
+      });
+      req.end();
+    } catch (err) { 
+      clearTimeout(timeout);
+      reject(err); 
+    }
   });
 }
 
@@ -47,32 +83,50 @@ async function loadSpec(entry) {
 function buildSecurityHandlers(entry) {
   const auth = entry.auth || {};
   const valueFrom = (env, fallback) => (env ? process.env[env] : undefined) || fallback || '';
+
+  // Check if required auth is available
+  if (auth.kind && auth.env && !valueFrom(auth.env)) {
+    return { available: false, reason: `Missing environment variable: ${auth.env}` };
+  }
+
   if (auth.kind === 'bearer') {
-    return { '*': ({ headers }) => { const t = valueFrom(auth.env, auth.value); if (!t) throw new Error(`Missing bearer token (env ${auth.env || 'unset'})`); headers['Authorization'] = `Bearer ${t}`; } };
+    return { available: true, '*': ({ headers }) => { const t = valueFrom(auth.env, auth.value); if (!t) throw new Error(`Missing bearer token (env ${auth.env || 'unset'})`); headers['Authorization'] = `Bearer ${t}`; } };
   } else if (auth.kind === 'header') {
-    return { '*': ({ headers }) => { const v = valueFrom(auth.env, auth.value); if (!v) throw new Error(`Missing header value (env ${auth.env || 'unset'})`); headers[auth.name || 'X-API-Key'] = v; } };
+    return { available: true, '*': ({ headers }) => { const v = valueFrom(auth.env, auth.value); if (!v) throw new Error(`Missing header value (env ${auth.env || 'unset'})`); headers[auth.name || 'X-API-Key'] = v; } };
   } else if (auth.kind === 'apiKey') {
     // { kind: 'apiKey', in: 'header'|'query'|'cookie', name: 'X-API-Key', env: 'SERVICE_KEY' }
-    return { '*': ({ headers, query }) => {
+    return { available: true, '*': ({ headers, query }) => {
       const v = valueFrom(auth.env, auth.value); if (!v) throw new Error(`Missing apiKey (env ${auth.env || 'unset'})`);
       if (auth.in === 'query') { if (query) query[auth.name] = v; }
       else if (auth.in === 'cookie') { headers['Cookie'] = `${auth.name}=${encodeURIComponent(v)}`; }
       else { headers[auth.name || 'X-API-Key'] = v; }
     }};
   }
-  return {};
+  return { available: true };
 }
 
 async function loadService(entry, allTools) {
   const { generateMcpTools } = require('../lib/openapi-generator');
-  const spec = await loadSpec(entry);
-  const baseUrl = entry.baseUrl || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+  
+  // Check if auth is available before loading the service
   const secHandlers = buildSecurityHandlers(entry);
-  const filters = entry.filters || {};
-  const tools = await generateMcpTools(spec, { baseUrl, filters, securityHandlers: new Proxy(secHandlers, { get: (t, p) => t[p] || t['*'] || undefined }) });
-  for (const t of tools) {
-    // prefix tool names with service name to avoid collisions
-    allTools.push({ name: `${entry.name}.${t.name}`, description: t.description || '', inputSchema: t.inputSchema || { type: 'object' }, handler: t.handler });
+  if (secHandlers.available === false) {
+    console.warn(`[${entry.name}] Skipping service: ${secHandlers.reason}`);
+    return;
+  }
+  
+  try {
+    const spec = await loadSpec(entry);
+    const baseUrl = entry.baseUrl || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+    const filters = entry.filters || {};
+    const tools = await generateMcpTools(spec, { baseUrl, filters, securityHandlers: new Proxy(secHandlers, { get: (t, p) => t[p] || t['*'] || undefined }) });
+    for (const t of tools) {
+      // prefix tool names with service name to avoid collisions
+      allTools.push({ name: `${entry.name}.${t.name}`, description: t.description || '', inputSchema: t.inputSchema || { type: 'object' }, handler: t.handler });
+    }
+    console.error(`[${entry.name}] Loaded ${tools.length} tools`);
+  } catch (error) {
+    console.warn(`[${entry.name}] Failed to load service: ${error.message}`);
   }
 }
 
@@ -83,14 +137,19 @@ async function callToolByName(name, args){ const tool = tools.find((t)=>t.name==
 function writeResponse(id, result, error){ const msg={jsonrpc:'2.0',id}; if(error) msg.error=error; else msg.result=result; process.stdout.write(JSON.stringify(msg)+'\n'); }
 function toRpcError(err){ return { code: -32000, message: err.message || 'Request failed', data: err.response || null }; }
 
-async function main(){
+async function loadServices(){
   const args = parseArgs(process.argv.slice(2));
-  const cfgPath = args.config || '';
-  if (!cfgPath) { console.error('Usage: node examples/mcp-multi-host.js --config ./services.json [--transport stdio|http|sse|ws]'); process.exit(1); }
-  const cfg = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), cfgPath), 'utf8'));
+  const cfgPath = args.config || process.argv[2] || path.join(__dirname, '..', 'services.default.json');
+  const fullCfgPath = path.resolve(cfgPath);
+  process.chdir(path.dirname(fullCfgPath));
+  const cfg = JSON.parse(fs.readFileSync(fullCfgPath, 'utf8'));
   const entries = Array.isArray(cfg.services) ? cfg.services : [];
   if (!entries.length) { console.error('No services in config'); process.exit(1); }
   for (const entry of entries) { await loadService(entry, tools); }
+}
+
+async function main(){
+  const args = parseArgs(process.argv.slice(2));
   const transport = (args.transport || 'stdio').toLowerCase();
   if (transport === 'http') {
     const app = express();
@@ -150,7 +209,7 @@ async function main(){
         const line = buffer.slice(0, idx).trim(); buffer = buffer.slice(idx + 1);
         if (!line) continue; let msg; try { msg = JSON.parse(line); } catch (_) { writeResponse(null, null, { code: -32700, message: 'Parse error' }); continue; }
         const { id, method, params } = msg || {};
-        if (method === 'initialize') { writeResponse(id, { protocolVersion: '0.1.0', serverInfo: { name: 'mcp-multi-host', version: '0.1.0' }, capabilities: { tools: {} } }); continue; }
+        if (method === 'initialize') { writeResponse(id, { protocolVersion: '2024-11-05', serverInfo: { name: 'mcp-multi-host', version: '1.3.2' }, capabilities: { tools: {} } }); continue; }
         if (method === 'tools/list') { writeResponse(id, listToolsResponse()); continue; }
         if (method === 'tools/call') {
           try { const result = await callToolByName(params?.name, params?.arguments || {}); writeResponse(id, { content: [{ type: 'json', json: result }] }); }
@@ -163,4 +222,39 @@ async function main(){
   }
 }
 
-main().catch((e)=>{ console.error('Fatal:', e.message); process.exit(1); });
+async function maybeOnce() {
+  const args = process.argv.slice(2);
+  const onceIndex = args.indexOf('--once');
+  if (onceIndex === -1) return false;
+  
+  const method = args[onceIndex + 1];
+  const params = args[onceIndex + 2] ? JSON.parse(args[onceIndex + 2]) : {};
+  
+  try {
+    if (method === 'tools/list') { 
+      console.log(JSON.stringify(listToolsResponse(), null, 2)); 
+      return true; 
+    }
+    if (method === 'tools/call') {
+      const result = await callToolByName(params?.name, params?.arguments || {});
+      console.log(JSON.stringify(result, null, 2));
+      return true;
+    }
+    throw new Error(`Unknown method: ${method}`);
+  } catch (err) {
+    console.error('Error:', err.message);
+    process.exitCode = 1;
+    return true;
+  }
+}
+
+(async () => {
+  // Always load services first
+  await loadServices();
+  
+  // Then check if this is a --once call
+  if (await maybeOnce()) return;
+  
+  // Otherwise run the main transport loop
+  await main();
+})().catch((e)=>{ console.error('Fatal:', e.message); process.exit(1); });
