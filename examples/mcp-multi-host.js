@@ -48,32 +48,50 @@ async function loadSpec(entry) {
 function buildSecurityHandlers(entry) {
   const auth = entry.auth || {};
   const valueFrom = (env, fallback) => (env ? process.env[env] : undefined) || fallback || '';
+
+  // Check if required auth is available
+  if (auth.kind && auth.env && !valueFrom(auth.env)) {
+    return { available: false, reason: `Missing environment variable: ${auth.env}` };
+  }
+
   if (auth.kind === 'bearer') {
-    return { '*': ({ headers }) => { const t = valueFrom(auth.env, auth.value); if (!t) throw new Error(`Missing bearer token (env ${auth.env || 'unset'})`); headers['Authorization'] = `Bearer ${t}`; } };
+    return { available: true, '*': ({ headers }) => { const t = valueFrom(auth.env, auth.value); if (!t) throw new Error(`Missing bearer token (env ${auth.env || 'unset'})`); headers['Authorization'] = `Bearer ${t}`; } };
   } else if (auth.kind === 'header') {
-    return { '*': ({ headers }) => { const v = valueFrom(auth.env, auth.value); if (!v) throw new Error(`Missing header value (env ${auth.env || 'unset'})`); headers[auth.name || 'X-API-Key'] = v; } };
+    return { available: true, '*': ({ headers }) => { const v = valueFrom(auth.env, auth.value); if (!v) throw new Error(`Missing header value (env ${auth.env || 'unset'})`); headers[auth.name || 'X-API-Key'] = v; } };
   } else if (auth.kind === 'apiKey') {
     // { kind: 'apiKey', in: 'header'|'query'|'cookie', name: 'X-API-Key', env: 'SERVICE_KEY' }
-    return { '*': ({ headers, query }) => {
+    return { available: true, '*': ({ headers, query }) => {
       const v = valueFrom(auth.env, auth.value); if (!v) throw new Error(`Missing apiKey (env ${auth.env || 'unset'})`);
       if (auth.in === 'query') { if (query) query[auth.name] = v; }
       else if (auth.in === 'cookie') { headers['Cookie'] = `${auth.name}=${encodeURIComponent(v)}`; }
       else { headers[auth.name || 'X-API-Key'] = v; }
     }};
   }
-  return {};
+  return { available: true };
 }
 
 async function loadService(entry, allTools) {
   const { generateMcpTools } = require('../lib/openapi-generator');
-  const spec = await loadSpec(entry);
-  const baseUrl = entry.baseUrl || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+  
+  // Check if auth is available before loading the service
   const secHandlers = buildSecurityHandlers(entry);
-  const filters = entry.filters || {};
-  const tools = await generateMcpTools(spec, { baseUrl, filters, securityHandlers: new Proxy(secHandlers, { get: (t, p) => t[p] || t['*'] || undefined }) });
-  for (const t of tools) {
-    // prefix tool names with service name to avoid collisions
-    allTools.push({ name: `${entry.name}.${t.name}`, description: t.description || '', inputSchema: t.inputSchema || { type: 'object' }, handler: t.handler });
+  if (secHandlers.available === false) {
+    console.warn(`[${entry.name}] Skipping service: ${secHandlers.reason}`);
+    return;
+  }
+  
+  try {
+    const spec = await loadSpec(entry);
+    const baseUrl = entry.baseUrl || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+    const filters = entry.filters || {};
+    const tools = await generateMcpTools(spec, { baseUrl, filters, securityHandlers: new Proxy(secHandlers, { get: (t, p) => t[p] || t['*'] || undefined }) });
+    for (const t of tools) {
+      // prefix tool names with service name to avoid collisions
+      allTools.push({ name: `${entry.name}.${t.name}`, description: t.description || '', inputSchema: t.inputSchema || { type: 'object' }, handler: t.handler });
+    }
+    console.log(`[${entry.name}] Loaded ${tools.length} tools`);
+  } catch (error) {
+    console.warn(`[${entry.name}] Failed to load service: ${error.message}`);
   }
 }
 
