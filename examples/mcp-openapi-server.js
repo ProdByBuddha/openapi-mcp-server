@@ -115,22 +115,22 @@ function buildSecurityHandlersFromEnv(api) {
   const handlers = {};
   const schemes = (api && api.components && api.components.securitySchemes) || {};
   for (const [name, def] of Object.entries(schemes)) {
-    handlers[name] = (headers, query, args, schemeDef) => {
-      if (!schemeDef) schemeDef = def;
-      if (!schemeDef || !schemeDef.type) return;
-      if (schemeDef.type === 'apiKey') {
+    handlers[name] = ({ def: schemeDef, headers, query, args }) => {
+      const d = schemeDef || def || {};
+      if (!d || !d.type) return;
+      if (d.type === 'apiKey') {
         const envKey = process.env[`OPENAPI_APIKEY_${String(name).toUpperCase()}`] || process.env.OPENAPI_API_KEY;
-        const v = args[schemeDef.name] || args.apiKey || envKey;
+        const v = (args && (args[d.name] || args.apiKey)) || envKey;
         if (!v) return;
-        if (schemeDef.in === 'header') headers[schemeDef.name] = v;
-        else if (schemeDef.in === 'query') query[schemeDef.name] = v;
-        else if (schemeDef.in === 'cookie') { args[schemeDef.name] = args[schemeDef.name] || v; }
-      } else if (schemeDef.type === 'http' && schemeDef.scheme === 'bearer') {
-        const v = args.bearerToken || process.env.OPENAPI_BEARER_TOKEN;
+        if (d.in === 'header') headers[d.name] = v;
+        else if (d.in === 'query') query[d.name] = v;
+        else if (d.in === 'cookie') { if (args) args[d.name] = args[d.name] || v; }
+      } else if (d.type === 'http' && d.scheme === 'bearer') {
+        const v = (args && args.bearerToken) || process.env.OPENAPI_BEARER_TOKEN;
         if (v) headers['Authorization'] = `Bearer ${v}`;
-      } else if (schemeDef.type === 'http' && schemeDef.scheme === 'basic') {
-        const user = args.username || process.env.OPENAPI_BASIC_USER;
-        const pass = args.password || process.env.OPENAPI_BASIC_PASS;
+      } else if (d.type === 'http' && d.scheme === 'basic') {
+        const user = (args && args.username) || process.env.OPENAPI_BASIC_USER;
+        const pass = (args && args.password) || process.env.OPENAPI_BASIC_PASS;
         if (user && pass) headers['Authorization'] = `Basic ${Buffer.from(`${user}:${pass}`).toString('base64')}`;
       }
     };
@@ -161,10 +161,38 @@ async function loadOpenApiSpec() {
           let body = '';
           res.setEncoding('utf8');
           res.on('data', (c) => (body += c));
-          res.on('end', () => {
-            try { resolve(JSON.parse(body)); }
-            catch (err) { reject(new Error('OPENAPI_SPEC_URL did not return JSON')); }
-          });
+        res.on('end', () => {
+          // Try JSON first
+          try { resolve(JSON.parse(body)); return; } catch (_) {}
+          // Try YAML if available
+          try { const YAML = require('yaml'); resolve(YAML.parse(body)); return; } catch (_) {}
+          // Try to extract swaggerDoc JSON from a JS init file (e.g., Swagger UI init)
+          try {
+            const idx = body.indexOf('"swaggerDoc"');
+            if (idx !== -1) {
+              const braceStart = body.indexOf('{', idx);
+              if (braceStart !== -1) {
+                let i = braceStart, depth = 0, inStr = false, esc = false;
+                for (; i < body.length; i++) {
+                  const ch = body[i];
+                  if (inStr) {
+                    if (esc) { esc = false; continue; }
+                    if (ch === '\\') { esc = true; continue; }
+                    if (ch === '"') { inStr = false; continue; }
+                    continue;
+                  }
+                  if (ch === '"') { inStr = true; continue; }
+                  if (ch === '{') depth++;
+                  if (ch === '}') { depth--; if (depth === 0) { i++; break; } }
+                }
+                const jsonStr = body.slice(braceStart, i);
+                resolve(JSON.parse(jsonStr));
+                return;
+              }
+            }
+          } catch (_) {}
+          reject(new Error('OPENAPI_SPEC_URL did not return a parseable spec (JSON/YAML/swaggerDoc)'));
+        });
         });
         req.on('error', reject);
         req.end();
@@ -249,7 +277,7 @@ async function main() {
       let msg;
       try { msg = JSON.parse(line); } catch (_) { writeResponse(null, null, { code: -32700, message: 'Parse error' }); continue; }
       const { id, method, params } = msg || {};
-      if (method === 'initialize') { writeResponse(id, { protocolVersion: '0.1.0', serverInfo: { name: 'mcp-openapi', version: '0.1.0' }, capabilities: { tools: {} } }); continue; }
+      if (method === 'initialize') { writeResponse(id, { protocolVersion: '2024-11-05', serverInfo: { name: 'mcp-openapi', version: '1.3.0' }, capabilities: { tools: {} } }); continue; }
       if (method === 'tools/list') { writeResponse(id, listToolsResponse()); continue; }
       if (method === 'tools/call') {
         const name = params?.name; const args = params?.arguments || params?.args || {};
@@ -262,4 +290,3 @@ async function main() {
 }
 
 main().catch((e) => { console.error('Fatal:', e.stack || e.message); process.exit(1); });
-

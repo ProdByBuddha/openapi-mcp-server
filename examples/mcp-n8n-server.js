@@ -459,7 +459,7 @@ async function main() {
       const { id, method, params } = msg || {};
       // Basic MCP method support
       if (method === 'initialize') {
-        writeResponse(id, { protocolVersion: '0.1.0', serverInfo: { name: 'mcp-n8n', version: '0.1.0' }, capabilities: { tools: {} } });
+        writeResponse(id, { protocolVersion: '2024-11-05', serverInfo: { name: 'mcp-n8n', version: '1.3.0' }, capabilities: { tools: {} } });
         continue;
       }
       if (method === 'tools/list') {
