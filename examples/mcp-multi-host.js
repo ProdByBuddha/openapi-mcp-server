@@ -150,7 +150,7 @@ async function main(){
         const line = buffer.slice(0, idx).trim(); buffer = buffer.slice(idx + 1);
         if (!line) continue; let msg; try { msg = JSON.parse(line); } catch (_) { writeResponse(null, null, { code: -32700, message: 'Parse error' }); continue; }
         const { id, method, params } = msg || {};
-        if (method === 'initialize') { writeResponse(id, { protocolVersion: '0.1.0', serverInfo: { name: 'mcp-multi-host', version: '0.1.0' }, capabilities: { tools: {} } }); continue; }
+        if (method === 'initialize') { writeResponse(id, { protocolVersion: '2024-11-05', serverInfo: { name: 'mcp-multi-host', version: '1.3.2' }, capabilities: { tools: {} } }); continue; }
         if (method === 'tools/list') { writeResponse(id, listToolsResponse()); continue; }
         if (method === 'tools/call') {
           try { const result = await callToolByName(params?.name, params?.arguments || {}); writeResponse(id, { content: [{ type: 'json', json: result }] }); }
