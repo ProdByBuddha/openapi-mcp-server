@@ -87,6 +87,7 @@ function toRpcError(err){ return { code: -32000, message: err.message || 'Reques
 async function main(){
   const args = parseArgs(process.argv.slice(2));
   const cfgPath = args.config || path.join(__dirname, '..', 'services.default.json');
+  process.chdir(path.dirname(cfgPath));
   const cfg = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), cfgPath), 'utf8'));
   const entries = Array.isArray(cfg.services) ? cfg.services : [];
   if (!entries.length) { console.error('No services in config'); process.exit(1); }
