@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /*
  * Multi-service MCP Host (stdio)
  * Loads N+1 services (Hostinger, n8n, arbitrary OpenAPI) into one process.
