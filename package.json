@@ -1,6 +1,6 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-multi-host.js",
   "bin": {
