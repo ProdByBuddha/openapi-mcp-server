@@ -23,3 +23,5 @@ scripts*
 output.json
 RELEASE.md
 # Keep generated tools in VCS (do NOT ignore examples/generated)
+
+.kiro

@@ -16,10 +16,16 @@
     "examples",
     "specs",
     "services.default.json",
+    "services.dynamic.json",
+    "start-mcp-server.sh",
+    "install-mcp.sh",
+    ".env.example",
+    "MCP_SETUP.md",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
+    "setup-mcp": "./install-mcp.sh",
     "start": "node examples/mcp-n8n-server.js",
     "test": "node tests/run-all.js",
     "test:all": "npm run test",

@@ -45,21 +45,7 @@
         ]
       }
     },
-    {
-      "name": "openai",
-      "type": "openapi",
-      "specUrl": "https://raw.githubusercontent.com/openai/openai-openapi/master/openapi.yaml",
-      "baseUrl": "https://api.openai.com/v1",
-      "auth": {
-        "kind": "bearer",
-        "env": "OPENAI_API_KEY"
-      },
-      "filters": {
-        "includeTagsRe": [
-          "chat|completions|embeddings|files|assistants"
-        ]
-      }
-    },
+
     {
       "name": "stripe",
       "type": "openapi",
@@ -117,7 +103,7 @@
       "name": "n8n",
       "type": "openapi",
       "specFile": "specs/n8n-api.json",
-      "baseUrl": "http://localhost:5678/api/v1",
+      "baseUrl": "https://n8n.readmyfineprint.com/api/v1",
       "auth": {
         "kind": "header",
         "name": "X-N8N-API-KEY",
@@ -125,7 +111,7 @@
       },
       "filters": {
         "includeTagsRe": [
-          "Workflows|Executions|Credentials"
+          "Workflow|Execution|Credential|User|Variables|Audit|Tags|SourceControl|Projects"
         ]
       }
     },
