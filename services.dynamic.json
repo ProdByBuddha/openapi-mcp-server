@@ -209,7 +209,7 @@
     {
       "name": "adobe_pdf",
       "type": "openapi",
-      "specFile": "specs/adobe-pdf-services.yaml",
+      "specUrl": "specs/adobe-pdf-services.yaml",
       "baseUrl": "https://pdf-services.adobe.io",
       "auth": {
         "kind": "bearer",
@@ -217,6 +217,22 @@
       },
       "filters": {
         "includeTagsRe": []
+      }
+    },
+    {
+      "name": "unipile",
+      "type": "openapi",
+      "specUrl": "https://api1.unipile.com:13111/api-json",
+      "baseUrl": "https://api1.unipile.com:13111/api/v1/",
+      "auth": {
+        "kind": "bearer",
+        "env": "UNIPILE_API_KEY",
+        "account_id": "UNIPILE_ACCOUNT_ID"
+      },
+      "filters": {
+        "includeTagsRe": [
+          "accounts|messaging|users|posts|linkedin|emails|webhooks|calendar"
+        ]
       }
     }
   ]

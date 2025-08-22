@@ -97,6 +97,72 @@ async function httpGetJson(urlString, headers = {}) {
   });
 }
 
+// --- Auto-discovery helpers for docs pages (Swagger UI / Redoc / Stoplight) and WSDL ---
+function resolveUrl(base, maybe) { try { return new URL(maybe, base).toString(); } catch { return null; } }
+async function fetchText(urlString, extraHeaders = {}) {
+  return new Promise((resolve, reject) => {
+    try {
+      const u = new URL(urlString);
+      const lib = u.protocol === 'https:' ? https : http;
+      const req = lib.request({
+        protocol: u.protocol, hostname: u.hostname,
+        port: u.port || (u.protocol === 'https:' ? 443 : 80),
+        path: u.pathname + u.search, method: 'GET',
+        headers: Object.assign({ 'User-Agent': 'mcp-multi-host/auto-discover' }, extraHeaders)
+      }, (res) => {
+        if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          const next = new URL(res.headers.location, u).toString();
+          res.resume();
+          return resolve(fetchText(next, extraHeaders));
+        }
+        let body = '';
+        res.setEncoding('utf8');
+        res.on('data', (c)=> body+=c);
+        res.on('end',()=> resolve({ url: u.toString(), statusCode: res.statusCode, headers: res.headers, body }));
+      });
+      req.on('error', reject);
+      req.end();
+    } catch (e) { reject(e); }
+  });
+}
+
+function extractSpecCandidatesFromHtml(html, baseUrl) {
+  const out = [];
+  const add = (u, type='openapi', source='html', hint=null) => { const r = resolveUrl(baseUrl, u); if (r) out.push({ url: r, type, source, hint }); };
+  const linkRe = /(href|src)=["']([^"']*(?:openapi|swagger)[^"']*\.(?:json|ya?ml|js))["']/ig; let m;
+  while ((m = linkRe.exec(html))) add(m[2], 'openapi');
+  const wsdlRe = /(href|src)=["']([^"']*\.(?:wsdl))(?:["'])/ig; while ((m = wsdlRe.exec(html))) add(m[2], 'soap');
+  const redocRe = /<redoc[^>]*spec[-_ ]?url=["']([^"']+)["']/ig; while ((m = redocRe.exec(html))) add(m[1], 'openapi', 'html', 'redoc');
+  const stoplightRe = /<elements-api[^>]*apiDescriptionUrl=["']([^"']+)["']/ig; while ((m = stoplightRe.exec(html))) add(m[1], 'openapi', 'html', 'stoplight');
+  const swaggerUrlRe = /\burl\s*:\s*["']([^"']+)["']/ig; while ((m = swaggerUrlRe.exec(html))) add(m[1], 'openapi', 'html', 'swagger-ui');
+  const swaggerUrlsArrayRe = /\burls\s*:\s*\[(.*?)\]/igs; while ((m = swaggerUrlsArrayRe.exec(html))) {
+    const chunk = m[1] || ''; const urlItemRe = /\burl\s*:\s*["']([^"']+)["']/ig; let mi; while ((mi = urlItemRe.exec(chunk))) add(mi[1], 'openapi', 'html', 'swagger-ui');
+  }
+  const scripts = []; const scriptRe = /<script[^>]*src=["']([^"']+)["'][^>]*>/ig; let sm; while ((sm = scriptRe.exec(html))) { const u = resolveUrl(baseUrl, sm[1]); if (u) scripts.push(u); }
+  return { candidates: Array.from(new Set(out.map(JSON.stringify))).map(JSON.parse), scripts: Array.from(new Set(scripts)) };
+}
+
+function extractSpecCandidatesFromJs(js, baseUrl) {
+  const out = [];
+  const add = (u, type='openapi', source='js', hint=null) => { const r = resolveUrl(baseUrl, u); if (r) out.push({ url: r, type, source, hint }); };
+  const swaggerUrlRe = /\burl\s*:\s*["']([^"']+)["']/ig; let m; while ((m = swaggerUrlRe.exec(js))) add(m[1], 'openapi', 'js', 'swagger-ui');
+  const urlsArrayRe = /\burls\s*:\s*\[(.*?)\]/igs; while ((m = urlsArrayRe.exec(js))) { const part = m[1] || ''; const itemRe = /\burl\s*:\s*["']([^"']+)["']/ig; let mi; while ((mi = itemRe.exec(part))) add(mi[1], 'openapi', 'js', 'swagger-ui'); }
+  const directOpenApiRe = /https?:\/\/[^\s"']+(?:openapi|swagger)[^\s"']*\.(?:json|ya?ml)/ig; while ((m = directOpenApiRe.exec(js))) add(m[0], 'openapi', 'js');
+  const directWsdlRe = /https?:\/\/[^\s"']+\.(?:wsdl)/ig; while ((m = directWsdlRe.exec(js))) add(m[0], 'soap', 'js');
+  return Array.from(new Set(out.map(JSON.stringify))).map(JSON.parse);
+}
+
+async function discoverSpecUrls(docsUrl, { maxJs = 8 } = {}) {
+  const res = await fetchText(docsUrl);
+  const base = res.url; const html = res.body || '';
+  const { candidates, scripts } = extractSpecCandidatesFromHtml(html, base);
+  const out = [...candidates]; let scanned = 0;
+  for (const jsUrl of scripts) { if (scanned++ >= maxJs) break; try { const jsRes = await fetchText(jsUrl); const more = extractSpecCandidatesFromJs(jsRes.body || '', jsRes.url); for (const c of more) out.push(c); } catch (_) {} }
+  try { const host = new URL(base).hostname || ''; if (/dev\.wix\.com$/i.test(host) && !out.length) out.push({ url: 'https://www.wixapis.com/<product>/<vN>/swagger.json', type: 'openapi', source: 'hint', hint: 'wix-template' }); } catch {}
+  // dedupe by type+url
+  return Array.from(new Set(out.map((o) => `${o.type}|${o.url}`))).map((key) => { const [type, url] = key.split('|'); return out.find((o) => o.type === type && o.url === url) || { url, type }; });
+}
+
 async function loadSpec(entry) {
   const specFile = expandEnv(entry.specFile);
   const specUrl = expandEnv(entry.specUrl);
@@ -138,6 +204,29 @@ async function loadSoapService(entry, allTools) {
     console.error(`[${entry.name}] Loaded ${toolsLocal.length} SOAP tools`);
   } catch (e) {
     console.warn(`[${entry.name}] Failed to load SOAP service: ${e.message}`);
+  }
+}
+
+async function autoLoadService(entry, allTools) {
+  try {
+    const docsUrl = expandEnv(entry.url || entry.docsUrl || entry.specUrl || entry.specFile || entry.wsdlUrl);
+    if (!docsUrl) { console.warn(`[${entry.name}] auto: missing url/docsUrl`); return; }
+    const cands = await discoverSpecUrls(docsUrl, { maxJs: Number(entry.maxJs || 8) });
+    const openapi = cands.find((c) => c.type === 'openapi');
+    const soapCand = cands.find((c) => c.type === 'soap');
+    if (openapi) {
+      const next = Object.assign({}, entry, { type: 'openapi', specUrl: openapi.url });
+      await loadService(next, allTools);
+      return;
+    }
+    if (soapCand) {
+      const next = Object.assign({}, entry, { type: 'soap', wsdlUrl: soapCand.url });
+      await loadSoapService(next, allTools);
+      return;
+    }
+    console.warn(`[${entry.name}] auto: no candidates found at ${docsUrl}`);
+  } catch (e) {
+    console.warn(`[${entry.name}] auto: discovery failed: ${e.message}`);
   }
 }
 
@@ -210,14 +299,16 @@ async function loadServices(){
   for (const entry of entries) {
     const type = String(entry.type || 'openapi').toLowerCase();
     if (type === 'soap') await loadSoapService(entry, tools);
+    else if (type === 'auto') await autoLoadService(entry, tools);
     else await loadService(entry, tools);
   }
 }
 
-async function main(){
+async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const transport = (args.transport || 'stdio').toLowerCase();
-  if (transport === 'http') {
+  const transports = (args.transport || 'stdio,http,sse,ws').toLowerCase().split(',');
+
+  if (transports.includes('http')) {
     const app = express();
     app.use(bodyParser.json());
     app.post('/mcp', async (req, res) => {
@@ -231,25 +322,32 @@ async function main(){
         return res.status(400).json({ error: 'Unknown method' });
       } catch (e) { return res.status(500).json({ error: e.message }); }
     });
-    const port = process.env.PORT || 3005;
+    const port = args.port || process.env.PORT || 3005;
     app.listen(port, () => console.log(`[multi-host] HTTP listening on ${port}`));
-  } else if (transport === 'sse') {
+  }
+
+  if (transports.includes('sse')) {
     const app = express();
     app.use(bodyParser.json());
     app.get('/mcp-sse', (req, res) => {
       res.setHeader('Content-Type', 'text/event-stream');
       res.setHeader('Cache-Control', 'no-cache');
       res.setHeader('Connection', 'keep-alive');
-      const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+      const send = (data) => res.write(`data: ${JSON.stringify(data)}
+
+`);
       send({ message: 'MCP SSE connection established.' });
     });
-    const port = process.env.PORT || 3006;
+    const port = args.ssePort || process.env.SSE_PORT || 3006;
     app.listen(port, () => console.log(`[multi-host] SSE listening on ${port}`));
-  } else if (transport === 'ws' || transport === 'websocket') {
+  }
+
+  if (transports.includes('ws') || transports.includes('websocket')) {
     if (!WebSocketServer) { console.error('WS transport requested but ws is not installed'); process.exit(1); }
     const app = express();
     app.use(bodyParser.json());
-    const server = app.listen(process.env.PORT || 3007, () => console.log(`[multi-host] WS listening`));
+    const port = args.wsPort || process.env.WS_PORT || 3007;
+    const server = app.listen(port, () => console.log(`[multi-host] WS listening on ${port}`));
     const wss = new WebSocketServer({ server, path: '/mcp' });
     wss.on('connection', (ws) => {
       ws.on('message', async (msg) => {
@@ -265,7 +363,9 @@ async function main(){
         } catch (e) { ws.send(JSON.stringify({ error: e.message })); }
       });
     });
-  } else {
+  }
+
+  if (transports.includes('stdio')) {
     // stdio loop
     let buffer = '';
     process.stdin.setEncoding('utf8');
@@ -278,7 +378,7 @@ async function main(){
         if (method === 'initialize') { writeResponse(id, { protocolVersion: '2024-11-05', serverInfo: { name: 'mcp-multi-host', version: '1.3.2' }, capabilities: { tools: {} } }); continue; }
         if (method === 'tools/list') { writeResponse(id, listToolsResponse()); continue; }
         if (method === 'tools/call') {
-          try { const result = await callToolByName(params?.name, params?.arguments || {}); writeResponse(id, { content: [{ type: 'json', json: result }] }); }
+          try { const result = await callToolByName(params?.name, params?.arguments || {}); writeResponse(id, { content: [{ type: 'json', json: result }] }); } 
           catch (err) { writeResponse(id, null, toRpcError(err)); }
           continue;
         }
