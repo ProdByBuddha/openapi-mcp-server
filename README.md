@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/@prodbybuddha/openapi-mcp-server?logo=npm&color=cb0000)](https://www.npmjs.com/package/@prodbybuddha/openapi-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/ProdByBuddha/openapi-mcp-server?sort=semver)](https://github.com/ProdByBuddha/openapi-mcp-server/releases)
-[![Spec Gate](https://img.shields.io/endpoint?url=https://your-n8n/webhook/spec-gate-badge)](#spec-gate-conformance--fuzz)
+[![Spec Gate](https://img.shields.io/endpoint?url=https://n8n.readmyfineprint.com/webhook/spec-gate-badge)](#spec-gate-conformance--fuzz)
 
 Generic OpenAPI → MCP tool server with first‑class Docker, n8n & Hostinger integrations. It can:
 - Load any OpenAPI 3.x spec and generate MCP tools on the fly
