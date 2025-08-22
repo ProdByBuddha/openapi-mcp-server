@@ -29,6 +29,13 @@ This project provides comprehensive documentation to help you get started and ma
 *   **[For "Vibe Coders"](VIBE.md):** A simplified, non-technical introduction to the project's value and utility.
 *   **[GitHub Wiki](https://github.com/ProdByBuddha/openapi-mcp-server/wiki):** The most comprehensive and navigable source of documentation. It's automatically built and kept up-to-date from the project's source Markdown files, offering detailed guides, examples, and how-tos.
 
+### Spec Discovery (docs → spec URL)
+
+If you only have a docs page (Swagger UI, Redoc, Stoplight), use the discovery helper to extract the underlying OpenAPI URLs:
+
+- Run: `npm run discover:spec -- --url https://docs.example.com/reference`
+- Outputs a JSON array of candidate spec URLs (JSON/YAML). The tool also follows `.js` swagger init bundles to extract `url` or `urls` entries.
+
 ## Support
 
 If this project helps you, consider supporting:

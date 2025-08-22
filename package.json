@@ -1,6 +1,6 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-multi-host.js",
   "bin": {
@@ -63,7 +63,8 @@
     "openapi:spec-gate:hostinger": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3",
     "openapi:spec-gate:domains": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags Domains",
     "openapi:spec-gate:vps": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags VPS",
-    "openapi:spec-gate:dns": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags DNS"
+    "openapi:spec-gate:dns": "node examples/scripts/spec-gate.js --file examples/specs/hostinger-api.json --runs 3 --include-tags DNS",
+    "discover:spec": "node examples/scripts/discover-spec-from-docs.js --url"
   },
   "keywords": [
     "n8n",
