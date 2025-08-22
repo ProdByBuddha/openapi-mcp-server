@@ -99,8 +99,8 @@ async function httpGetJson(urlString, headers = {}) {
 async function loadSpec(entry) {
   const specFile = expandEnv(entry.specFile);
   const specUrl = expandEnv(entry.specUrl);
-  if (specFile) return JSON.parse(fs.readFileSync(path.resolve(process.cwd(), specFile), 'utf8'));
-  if (specUrl) return await httpGetJson(specUrl);
+  if (specFile) return path.resolve(process.cwd(), specFile); // return path string so swagger-parser can resolve $ref relative to file
+  if (specUrl) return specUrl; // return URL string so swagger-parser can resolve remote $ref relative to URL
   throw new Error(`Service ${entry.name} missing specFile/specUrl`);
 }
 

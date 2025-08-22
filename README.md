@@ -79,6 +79,7 @@ The server can also load OpenAPI specs dynamically on startup via env vars
   - Example: `npx -y @dotenvx/dotenvx run -- node examples/mcp-multi-host.js --config services.dynamic.json`
 - Fallback: the server also calls `dotenv.config()` internally to load `.env` if present.
 - Placeholders: `${VAR}` sequences in `services.*.specUrl`, `services.*.specFile`, and `services.*.baseUrl` are expanded from `process.env` at runtime.
+- $ref resolution: For `specUrl`, external `$ref` resolve relative to the URL. For `specFile`, they resolve relative to the file path.
 - Example `services.dynamic.json` entry with placeholders:
   ```json
   {
