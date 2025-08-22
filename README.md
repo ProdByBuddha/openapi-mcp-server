@@ -74,7 +74,10 @@ The server can also load OpenAPI specs dynamically on startup via env vars
 
 ### Env loading and placeholders
 
-- Env loading: The multi-host server now auto-loads env from `.env` using `dotenvx` when available (falls back to `dotenv`).
+- Recommended: run via `dotenvx` CLI to load `.env`, `.env.local`, and Vault keys.
+  - Install: see https://dotenvx.com
+  - Example: `npx -y @dotenvx/dotenvx run -- node examples/mcp-multi-host.js --config services.dynamic.json`
+- Fallback: the server also calls `dotenv.config()` internally to load `.env` if present.
 - Placeholders: `${VAR}` sequences in `services.*.specUrl`, `services.*.specFile`, and `services.*.baseUrl` are expanded from `process.env` at runtime.
 - Example `services.dynamic.json` entry with placeholders:
   ```json

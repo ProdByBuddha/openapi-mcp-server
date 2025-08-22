@@ -16,8 +16,8 @@
  * }
  */
 
-// Load environment variables early
-try { require('dotenvx').config(); } catch (e) { try { require('dotenv').config(); } catch (_) {} }
+// Load environment variables early (dotenvx via CLI recommended; fallback to dotenv here)
+try { require('dotenv').config(); } catch (_) {}
 
 const fs = require('fs');
 const path = require('path');
