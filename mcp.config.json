@@ -3,10 +3,14 @@
     {
       "name": "multi-host",
       "command": "node",
-      "args": ["examples/mcp-multi-host.js", "--config", "examples/services.example.json"],
+      "args": [
+        "examples/mcp-multi-host.js",
+        "--config",
+        "examples/services.example.json"
+      ],
       "env": {
-        "N8N_API_KEY": "${env:N8N_API_KEY}",
-        "HOSTINGER_API_TOKEN": "${env:HOSTINGER_API_TOKEN}",
+        "N8N_API_KEY": "N8N_API_KEY",
+        "HOSTINGER_API_TOKEN": "HOSTINGER_API_TOKEN",
         "OPENAPI_MCP_ALLOWED_METHODS": "GET,POST,PUT,PATCH,DELETE",
         "OPENAPI_MCP_ALLOWED_PATHS": "/workflows*,/executions*,/audit*,/credentials*,/tags*,/users*,/source-control/pull*,/variables*,/projects*,/webhook*,/union-*",
         "OPENAPI_MCP_RATE_LIMIT": "60",

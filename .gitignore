@@ -21,7 +21,10 @@ generated-*server/
 scripts*
 
 output.json
-RELEASE.md
 # Keep generated tools in VCS (do NOT ignore examples/generated)
 
 .kiro
+n8n/
+design.md
+requirements.md
+tasks.md
