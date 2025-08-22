@@ -160,6 +160,27 @@ This repo also includes a generic OpenAPI→MCP server that can expose any OpenA
 
 ## Hostinger Server
 
+## SOAP/WSDL (Experimental)
+
+The multi‑host server can now load SOAP services from a WSDL and expose each operation as an MCP tool.
+
+- Config entry example (services.dynamic.json):
+  ```json
+  {
+    "services": [
+      {
+        "name": "irs-mef",
+        "type": "soap",
+        "wsdlUrl": "${IRS_WSDL_URL}",
+        "endpoint": "${IRS_ENDPOINT}"  
+      }
+    ]
+  }
+  ```
+- Tool args: pass `{ "body": { /* request payload matching WSDL */ }, "headers": { /* optional HTTP headers */ } }`.
+- The server uses the `soap` package to parse the WSDL and generate operations.
+- Note: Some IRS/MEF services require certificates and whitelisted IPs; operations may fail without proper credentials.
+
 This repo includes a first-class Hostinger MCP server that dynamically loads tools from the bundled Hostinger OpenAPI spec (`examples/specs/hostinger-api.json`) or a URL/file.
 
 - Run (stdio): `HOSTINGER_API_TOKEN=... npm run mcp:hostinger`

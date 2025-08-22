@@ -1,6 +1,6 @@
 {
   "name": "@prodbybuddha/openapi-mcp-server",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "description": "Generic OpenAPI → MCP tool server with n8n integration and CLI utilities",
   "main": "examples/mcp-multi-host.js",
   "bin": {
@@ -82,7 +82,8 @@
     "swagger-parser": "^10.0.3",
     "swagger-spec-validator": "^5.0.0",
     "yaml": "^2.8.1",
-    "zod": "^3.22.4"
+    "zod": "^3.22.4",
+    "soap": "^0.45.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"

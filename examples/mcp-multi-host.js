@@ -24,6 +24,7 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 const express = require('express');
+let soap; try { soap = require('soap'); } catch (_) { soap = null; }
 const bodyParser = require('body-parser');
 let WebSocketServer; try { WebSocketServer = require('ws').WebSocketServer; } catch (_) { WebSocketServer = null; }
 
@@ -104,6 +105,42 @@ async function loadSpec(entry) {
   throw new Error(`Service ${entry.name} missing specFile/specUrl`);
 }
 
+async function loadSoapService(entry, allTools) {
+  if (!soap) { console.warn(`[${entry.name}] SOAP requested but 'soap' package not installed`); return; }
+  const wsdl = expandEnv(entry.wsdlUrl || entry.wsdlFile);
+  if (!wsdl) { console.warn(`[${entry.name}] Missing wsdlUrl/wsdlFile`); return; }
+  try {
+    const client = await soap.createClientAsync(wsdl, entry.soapOptions || {});
+    if (entry.endpoint) client.setEndpoint(expandEnv(entry.endpoint));
+    const desc = client.describe();
+    const toolsLocal = [];
+    const services = Object.keys(desc || {});
+    for (const svcName of services) {
+      const ports = desc[svcName] || {};
+      for (const portName of Object.keys(ports)) {
+        const ops = ports[portName] || {};
+        for (const opName of Object.keys(ops)) {
+          const tName = `${opName}`;
+          const inputSchema = { type: 'object', properties: { body: { type: 'object', description: 'SOAP request payload (object matching WSDL input)' }, headers: { type: 'object', description: 'Optional HTTP headers' } } };
+          const handler = async (args = {}) => {
+            const payload = args.body || {};
+            if (args.headers && typeof args.headers === 'object') client.addHttpHeader(args.headers);
+            const fn = client[`${opName}Async`];
+            if (typeof fn !== 'function') throw new Error(`SOAP operation not callable: ${opName}`);
+            const [result, raw, soapHeader] = await fn.call(client, payload);
+            return { result, raw, soapHeader };
+          };
+          toolsLocal.push({ name: tName, description: `SOAP ${svcName}.${portName}.${opName}`, inputSchema, handler });
+        }
+      }
+    }
+    for (const t of toolsLocal) allTools.push({ name: `${entry.name}.${t.name}`, description: t.description, inputSchema: t.inputSchema, handler: t.handler });
+    console.error(`[${entry.name}] Loaded ${toolsLocal.length} SOAP tools`);
+  } catch (e) {
+    console.warn(`[${entry.name}] Failed to load SOAP service: ${e.message}`);
+  }
+}
+
 function buildSecurityHandlers(entry) {
   const auth = entry.auth || {};
   const valueFrom = (env, fallback) => (env ? process.env[env] : undefined) || fallback || '';
@@ -170,7 +207,11 @@ async function loadServices(){
   const cfg = JSON.parse(fs.readFileSync(fullCfgPath, 'utf8'));
   const entries = Array.isArray(cfg.services) ? cfg.services : [];
   if (!entries.length) { console.error('No services in config'); process.exit(1); }
-  for (const entry of entries) { await loadService(entry, tools); }
+  for (const entry of entries) {
+    const type = String(entry.type || 'openapi').toLowerCase();
+    if (type === 'soap') await loadSoapService(entry, tools);
+    else await loadService(entry, tools);
+  }
 }
 
 async function main(){
