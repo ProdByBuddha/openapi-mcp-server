@@ -45,7 +45,6 @@
         ]
       }
     },
-
     {
       "name": "stripe",
       "type": "openapi",
@@ -128,6 +127,96 @@
         "excludeTagsRe": [
           "Deprecated|Internal"
         ]
+      }
+    },
+    {
+      "name": "usps",
+      "type": "openapi",
+      "specUrl": "https://raw.githubusercontent.com/lob/usps-webtools-api/main/usps-webtools-api.yml",
+      "baseUrl": "https://secure.shippingapis.com/ShippingAPI.dll",
+      "auth": {
+        "kind": "query",
+        "name": "USERID",
+        "env": "USPS_USER_ID"
+      },
+      "filters": {
+        "includeTagsRe": [
+          "Address|Tracking|Rate|Label"
+        ]
+      }
+    },
+    {
+      "name": "lob",
+      "type": "openapi",
+      "specUrl": "https://raw.githubusercontent.com/lob/lob-openapi/main/lob-api-public.yml",
+      "baseUrl": "https://api.lob.com/v1",
+      "auth": {
+        "kind": "basic",
+        "username_env": "LOB_API_KEY",
+        "password": ""
+      },
+      "filters": {
+        "includeTagsRe": [
+          "Letters|Postcards|Checks|US-Verifications|Addresses|Certified|Tracking"
+        ]
+      }
+    },
+    {
+      "name": "proof",
+      "type": "openapi",
+      "specUrl": "https://dev.proof.com/openapi.json",
+      "baseUrl": "https://dev.proof.com/api/v1",
+      "auth": {
+        "kind": "bearer",
+        "env": "PROOF_API_KEY"
+      },
+      "filters": {
+        "includeTagsRe": [
+          "documents|templates|signatures|workflows"
+        ]
+      }
+    },
+    {
+      "name": "wix",
+      "type": "openapi",
+      "specUrl": "https://www.wix.com/_api/rest-docs/wix-rest-docs/openapi3_0.json",
+      "baseUrl": "https://www.wixapis.com",
+      "auth": {
+        "kind": "bearer",
+        "env": "WIX_API_KEY"
+      },
+      "filters": {
+        "includeTagsRe": [
+          "sites|members|forms|contacts|stores|bookings|events|blog|portfolio"
+        ]
+      }
+    },
+    {
+      "name": "irs",
+      "type": "openapi",
+      "specUrl": "https://www.irs.gov/pub/irs-pdf/mef-openapi-spec.json",
+      "baseUrl": "https://testbed.irs.gov/mef",
+      "auth": {
+        "kind": "bearer",
+        "env": "IRS_API_KEY"
+      },
+      "filters": {
+        "includeTagsRe": [
+          "filing|forms|status|validation|acknowledgment|taxpayer"
+        ]
+      }
+    },
+    {
+      "name": "adobe_pdf",
+      "type": "openapi",
+      "specFile": "specs/adobe-pdf-services.yaml",
+      "baseUrl": "https://pdf-services.adobe.io",
+      "auth": {
+        "kind": "bearer",
+        "env": "ADOBE_ACCESS_TOKEN"
+      },
+      "filters": {
+        "includeTagsRe": []
       }
     }
   ]

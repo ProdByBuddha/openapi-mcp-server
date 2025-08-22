@@ -28,3 +28,6 @@ n8n/
 design.md
 requirements.md
 tasks.md
+
+*.backup
+*.code-workspace
