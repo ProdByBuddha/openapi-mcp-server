@@ -72,6 +72,26 @@ Use it programmatically or via the example CLI to pre‑generate tools JSON.
 The server can also load OpenAPI specs dynamically on startup via env vars
 (`OPENAPI_SPEC_FILE` or `OPENAPI_SPEC_URL`) without pre‑generation.
 
+### Env loading and placeholders
+
+- Env loading: The multi-host server now auto-loads env from `.env` using `dotenvx` when available (falls back to `dotenv`).
+- Placeholders: `${VAR}` sequences in `services.*.specUrl`, `services.*.specFile`, and `services.*.baseUrl` are expanded from `process.env` at runtime.
+- Example `services.dynamic.json` entry with placeholders:
+  ```json
+  {
+    "services": [
+      {
+        "name": "acme",
+        "type": "openapi",
+        "specUrl": "${ACME_SPEC_URL}",
+        "baseUrl": "${ACME_BASE_URL}",
+        "auth": { "kind": "bearer", "env": "ACME_TOKEN" }
+      }
+    ]
+  }
+  ```
+  Then set `.env` or exported envs: `ACME_SPEC_URL`, `ACME_BASE_URL`, `ACME_TOKEN`.
+
 ### Advanced: Custom Security Handlers
 
 If your OpenAPI defines custom security schemes or you want to override default behavior, pass `securityHandlers` to `generateMcpTools`:

@@ -16,6 +16,9 @@
  * }
  */
 
+// Load environment variables early
+try { require('dotenvx').config(); } catch (e) { try { require('dotenv').config(); } catch (_) {} }
+
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
@@ -25,6 +28,15 @@ const bodyParser = require('body-parser');
 let WebSocketServer; try { WebSocketServer = require('ws').WebSocketServer; } catch (_) { WebSocketServer = null; }
 
 function parseArgs(argv){ const o={}; for(let i=0;i<argv.length;i++){ const t=argv[i]; if(t.startsWith('--')){ const k=t.slice(2); const v=argv[i+1]&&!argv[i+1].startsWith('--')?argv[++i]:'true'; o[k]=v;} } return o; }
+
+function expandEnv(value) {
+  if (typeof value !== 'string') return value;
+  return value.replace(/\$\{([^}]+)\}/g, (_, key) => {
+    const v = process.env[String(key)];
+    return v !== undefined ? v : `
+${'{'}${key}}`;
+  });
+}
 
 async function httpGetJson(urlString, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -85,8 +97,10 @@ async function httpGetJson(urlString, headers = {}) {
 }
 
 async function loadSpec(entry) {
-  if (entry.specFile) return JSON.parse(fs.readFileSync(path.resolve(process.cwd(), entry.specFile), 'utf8'));
-  if (entry.specUrl) return await httpGetJson(entry.specUrl);
+  const specFile = expandEnv(entry.specFile);
+  const specUrl = expandEnv(entry.specUrl);
+  if (specFile) return JSON.parse(fs.readFileSync(path.resolve(process.cwd(), specFile), 'utf8'));
+  if (specUrl) return await httpGetJson(specUrl);
   throw new Error(`Service ${entry.name} missing specFile/specUrl`);
 }
 
@@ -127,7 +141,8 @@ async function loadService(entry, allTools) {
   
   try {
     const spec = await loadSpec(entry);
-    const baseUrl = entry.baseUrl || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+    const baseUrlRaw = entry.baseUrl || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
+    const baseUrl = expandEnv(baseUrlRaw);
     const filters = entry.filters || {};
     const tools = await generateMcpTools(spec, { baseUrl, filters, securityHandlers: new Proxy(secHandlers, { get: (t, p) => t[p] || t['*'] || undefined }) });
     for (const t of tools) {
