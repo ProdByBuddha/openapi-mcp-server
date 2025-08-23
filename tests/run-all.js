@@ -1,10 +1,23 @@
 // Minimal test runner: executes all *.test.js in this folder sequentially
-const fs = require('fs');
-const path = require('path');
-const { spawnSync, execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import { spawnSync, execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 let dotenvx;
-try { dotenvx = require('@dotenvx/dotenvx'); } catch (_) { 
-  try { dotenvx = require('dotenv'); } catch (_) { dotenvx = null; }
+try { 
+  const dotenvxModule = await import('@dotenvx/dotenvx');
+  dotenvx = dotenvxModule.default || dotenvxModule;
+} catch (_) { 
+  try { 
+    const dotenvModule = await import('dotenv');
+    dotenvx = dotenvModule.default || dotenvModule;
+  } catch (_) { 
+    dotenvx = null; 
+  }
 }
 
 const dir = __dirname;

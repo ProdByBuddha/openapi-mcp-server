@@ -1,9 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const assert = require('assert');
-const { spawnSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import assert from 'assert';
+import { spawnSync } from 'child_process';
 
-const { generateMcpTools } = require('../lib/openapi-generator');
+import { generateMcpTools } from '../lib/openapi-generator/index.js';
 
 function writeJson(filePath, obj) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });

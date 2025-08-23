@@ -36,3 +36,14 @@ tasks.md
 *.code-workspace
 
 todo.txt
+linkedin-intelligence-analyzer.js
+*.log
+*.patch
+
+content/
+content/*
+
+analysis/
+analysis/*
+
+.vscode

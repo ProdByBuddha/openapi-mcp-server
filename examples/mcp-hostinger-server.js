@@ -13,17 +13,26 @@
  *   - OPENAPI_MCP_ALLOWED_METHODS, OPENAPI_MCP_ALLOWED_PATHS, OPENAPI_MCP_RATE_LIMIT, OPENAPI_MCP_RATE_WINDOW_MS
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables (dotenvx recommended)
 try { 
-  require('@dotenvx/dotenvx').config({ quiet: true }); 
+  const { config } = await import('@dotenvx/dotenvx');
+  config({ quiet: true }); 
 } catch (_) {
   // Fallback to basic dotenv
-  try { require('dotenv').config(); } catch (_) {}
+  try { 
+    const { config } = await import('dotenv');
+    config(); 
+  } catch (_) {}
 }
 
 const tools = [];

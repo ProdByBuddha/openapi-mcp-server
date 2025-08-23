@@ -232,6 +232,9 @@
       "filters": {
         "includeTagsRe": [
           "accounts|messaging|users|posts|linkedin|emails|webhooks|calendar"
+        ],
+        "includeOpsRe": [
+          ".*search.*|.*profile.*|.*post.*|.*account.*|.*linkedin.*"
         ]
       }
     }

@@ -1,6 +1,6 @@
-const fs = require('fs');
-const path = require('path');
-const { generateMcpTools } = require('./lib/openapi-generator');
+import fs from 'fs';
+import path from 'path';
+import { generateMcpTools } from '../lib/openapi-generator/index.js';
 
 async function test() {
   try {

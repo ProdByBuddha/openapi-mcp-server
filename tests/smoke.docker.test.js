@@ -1,5 +1,5 @@
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import path from 'path';
 
 function runOnce(method, params) {
   return new Promise((resolve, reject) => {

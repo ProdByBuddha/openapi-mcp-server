@@ -11,8 +11,8 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 const http = require('http');
-const { generateMcpTools } = require('../lib/openapi-generator');
-const { generateMcpServer } = require('../lib/openapi-generator/server-generator');
+const { generateMcpTools } = require('../../lib/openapi-generator');
+const { generateMcpServer } = require('../../lib/openapi-generator/server-generator');
 
 function parseArgs(argv) {
   const out = { _: [] };

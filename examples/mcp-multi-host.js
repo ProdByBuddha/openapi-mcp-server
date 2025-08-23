@@ -16,22 +16,46 @@
  * }
  */
 
-// Load environment variables early (dotenvx recommended)
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import express from 'express';
+import bodyParser from 'body-parser';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Optional imports with error handling
+let soap = null;
 try { 
-  require('@dotenvx/dotenvx').config({ quiet: true }); 
-} catch (_) {
-  // Fallback to basic dotenv
-  try { require('dotenv').config(); } catch (_) {}
+  const soapModule = await import('soap');
+  soap = soapModule.default || soapModule;
+} catch (_) { 
+  soap = null; 
 }
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
-const express = require('express');
-let soap; try { soap = require('soap'); } catch (_) { soap = null; }
-const bodyParser = require('body-parser');
-let WebSocketServer; try { WebSocketServer = require('ws').WebSocketServer; } catch (_) { WebSocketServer = null; }
+let WebSocketServer = null;
+try { 
+  const wsModule = await import('ws');
+  WebSocketServer = wsModule.WebSocketServer;
+} catch (_) { 
+  WebSocketServer = null; 
+}
+
+// Load environment variables early (dotenvx recommended)
+try { 
+  const { config } = await import('@dotenvx/dotenvx');
+  config({ quiet: true }); 
+} catch (_) {
+  // Fallback to basic dotenv
+  try { 
+    const { config } = await import('dotenv');
+    config(); 
+  } catch (_) {}
+}
 
 function parseArgs(argv){ const o={}; for(let i=0;i<argv.length;i++){ const t=argv[i]; if(t.startsWith('--')){ const k=t.slice(2); const v=argv[i+1]&&!argv[i+1].startsWith('--')?argv[++i]:'true'; o[k]=v;} } return o; }
 
@@ -66,7 +90,7 @@ async function httpGetJson(urlString, headers = {}) {
         let body = '';
         res.setEncoding('utf8');
         res.on('data', (c)=> body+=c);
-        res.on('end',()=>{
+        res.on('end',async ()=>{
           if (urlString.endsWith('.js')) {
             try {
               const jsonp = body.substring(body.indexOf('{'), body.lastIndexOf('}') + 1);
@@ -80,7 +104,12 @@ async function httpGetJson(urlString, headers = {}) {
           // Try JSON first
           try { resolve(JSON.parse(body)); return; } catch (_) {}
           // Try YAML if available
-          try { const YAML = require('yaml'); resolve(YAML.parse(body)); return; } catch (_) {}
+          try { 
+            const YAML = await import('yaml');
+            const yamlModule = YAML.default || YAML;
+            resolve(yamlModule.parse(body)); 
+            return; 
+          } catch (_) {}
           // If neither works, reject with more specific error
           reject(new Error(`Response is not valid JSON or YAML. Content-Type: ${res.headers['content-type']}, Status: ${res.statusCode}`));
         });
@@ -261,7 +290,7 @@ function buildSecurityHandlers(entry) {
 }
 
 async function loadService(entry, allTools) {
-  const { generateMcpTools } = require('../lib/openapi-generator');
+  const { generateMcpTools } = await import('../lib/openapi-generator/index.js');
   
   // Check if auth is available before loading the service
   const secHandlers = buildSecurityHandlers(entry);

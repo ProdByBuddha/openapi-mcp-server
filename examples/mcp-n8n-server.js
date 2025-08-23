@@ -16,17 +16,26 @@
  * - N8N_BASIC_AUTH_USER / N8N_BASIC_AUTH_PASS (sent as Basic auth)
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Load environment variables (dotenvx recommended)
 try {
-  require('@dotenvx/dotenvx').config({ quiet: true });
+  const { config } = await import('@dotenvx/dotenvx');
+  config({ quiet: true });
 } catch (_) {
   // Fallback to basic dotenv
-  try { require('dotenv').config(); } catch (_) { }
+  try { 
+    const { config } = await import('dotenv');
+    config(); 
+  } catch (_) { }
 }
 
 const BASE_URL = process.env.N8N_API_URL || 'http://localhost:5678/rest';
@@ -287,7 +296,7 @@ try {
   const SPEC_URL = process.env.OPENAPI_SPEC_URL || '';
   const OPENAPI_BASE_URL = process.env.OPENAPI_BASE_URL || process.env.N8N_API_URL || '';
   if (SPEC_FILE || SPEC_URL) {
-    const { generateMcpTools } = require('../lib/openapi-generator');
+    const { generateMcpTools } = await import('../lib/openapi-generator/index.js');
 
     async function loadOpenApiSpec() {
       if (SPEC_FILE) {
@@ -298,8 +307,8 @@ try {
         } catch (_) {
           // Try YAML
           try {
-            const YAML = require('yaml');
-            return YAML.parse(raw);
+            const YAML = await import('yaml');
+            return YAML.default.parse(raw);
           } catch (_) {
             throw new Error('OPENAPI_SPEC_FILE must be a valid JSON or YAML file');
           }
@@ -322,13 +331,13 @@ try {
             let body = '';
             res.setEncoding('utf8');
             res.on('data', (c) => (body += c));
-            res.on('end', () => {
+            res.on('end', async () => {
               // Try JSON first
               try { resolve(JSON.parse(body)); return; } catch (_) { }
               // Try YAML if available
               try {
-                const YAML = require('yaml');
-                resolve(YAML.parse(body));
+                const YAML = await import('yaml');
+                resolve(YAML.default.parse(body));
                 return;
               } catch (_) { }
               reject(new Error('OPENAPI_SPEC_URL did not return a parseable spec (JSON/YAML)'));

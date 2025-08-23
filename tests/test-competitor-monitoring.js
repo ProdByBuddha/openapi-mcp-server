@@ -5,8 +5,8 @@
  * This demonstrates the alternative approach to competitor intelligence
  */
 
-const { execSync } = require('child_process');
-const fs = require('fs');
+import { execSync } from 'child_process';
+import fs from 'fs';
 
 // Sample competitor database
 const competitors = [

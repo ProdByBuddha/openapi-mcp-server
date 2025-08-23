@@ -1,7 +1,7 @@
 // End-to-end test for the MCP server against a live n8n API
 // Skips if N8N_API_URL or N8N_API_KEY are not set
 
-const { spawn } = require('child_process');
+import { spawn } from 'child_process';
 const path = require('path');
 const fs = require('fs');
 let dotenvx;

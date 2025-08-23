@@ -1,6 +1,6 @@
 // E2E for Hostinger MCP (skips without HOSTINGER_API_TOKEN)
-const { spawn } = require('child_process');
-const path = require('path');
+import { spawn } from 'child_process';
+import path from 'path';
 
 function log(msg) { process.stdout.write(msg + '\n'); }
 

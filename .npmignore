@@ -19,6 +19,9 @@ backups/
 data/
 generated-*server/
 scripts*
+# Allow example discovery scripts
+!examples/scripts/
+!examples/scripts/**
 
 output.json
 # Keep generated tools in VCS (do NOT ignore examples/generated)
@@ -33,3 +36,14 @@ tasks.md
 *.code-workspace
 
 todo.txt
+linkedin-intelligence-analyzer.js
+*.log
+*.patch
+
+content/
+content/*
+
+analysis/
+analysis/*
+
+.vscode

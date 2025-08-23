@@ -1,9 +1,9 @@
-const assert = require('assert');
-const path = require('path');
-const fs = require('fs');
-const { spawnSync } = require('child_process');
+import assert from 'assert';
+import path from 'path';
+import fs from 'fs';
+import { spawnSync } from 'child_process';
 
-const gen = require('../lib/openapi-generator');
+import * as gen from '../lib/openapi-generator/index.js';
 
 (async () => {
   try {

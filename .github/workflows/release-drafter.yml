@@ -1,21 +1,30 @@
-name: Release Drafter
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '🚀 Features'
+    labels: ['feature', 'enhancement']
+  - title: '🐛 Fixes'
+    labels: ['fix', 'bug']
+  - title: '🧰 Maintenance'
+    labels: ['chore', 'maintenance', 'deps']
+  - title: '🔐 Security'
+    labels: ['security']
+change-template: '- $TITLE (#$NUMBER) @$AUTHOR'
+template: |
+  ## Changes
 
-on:
-  push:
-    branches:
-      - main
-      - master
-  pull_request:
-    types: [opened, reopened, synchronize, closed]
+  $CHANGES
 
-jobs:
-  update_release_draft:
-    if: github.event_name == 'push' || github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: release-drafter/release-drafter@v6
-        with:
-          config-name: release-drafter.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  ## Contributors
+
+  $CONTRIBUTORS
+
+version-resolver:
+  major:
+    labels: ['semver:major']
+  minor:
+    labels: ['semver:minor', 'feature']
+  patch:
+    labels: ['semver:patch', 'fix', 'bug', 'chore', 'maintenance']
+  default: patch
 

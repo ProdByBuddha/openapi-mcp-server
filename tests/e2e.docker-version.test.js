@@ -1,8 +1,8 @@
 // E2E-ish test for docker.engine.version via dedicated Docker MCP server.
 // Skips unless DOCKER_API_HOST is set or DOCKER_SOCK exists and is readable.
-const fs = require('fs');
-const { spawn } = require('child_process');
-const path = require('path');
+import fs from 'fs';
+import { spawn } from 'child_process';
+import path from 'path';
 
 function shouldRun() {
   const api = process.env.DOCKER_API_HOST;
