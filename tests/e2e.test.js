@@ -4,8 +4,10 @@
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-let dotenv;
-try { dotenv = require('dotenv'); } catch (_) { dotenv = null; }
+let dotenvx;
+try { dotenvx = require('@dotenvx/dotenvx'); } catch (_) { 
+  try { dotenvx = require('dotenv'); } catch (_) { dotenvx = null; }
+}
 
 // Minimal .env loader (same logic as run-all.js)
 function loadEnvFile(filePath) {
@@ -40,7 +42,7 @@ const envCandidates = [
 ];
 for (const p of envCandidates) {
   if (fs.existsSync(p)) {
-    if (dotenv) dotenv.config({ path: p, override: false });
+    if (dotenvx) dotenvx.config({ path: p, override: false });
     loadEnvFile(p);
   }
 }

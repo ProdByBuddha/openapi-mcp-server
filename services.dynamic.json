@@ -6,7 +6,7 @@
       "specUrl": "https://raw.githubusercontent.com/github/rest-api-description/main/descriptions/api.github.com/api.github.com.json",
       "baseUrl": "https://api.github.com",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "GITHUB_TOKEN"
       },
       "filters": {
@@ -21,7 +21,7 @@
       "specUrl": "https://raw.githubusercontent.com/slackapi/slack-api-specs/master/web-api/slack_web_openapi_v2.json",
       "baseUrl": "https://slack.com/api",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "SLACK_BOT_TOKEN"
       },
       "filters": {
@@ -36,7 +36,7 @@
       "specUrl": "https://raw.githubusercontent.com/ramnes/notion-sdk-py/main/notion_client/openapi.json",
       "baseUrl": "https://api.notion.com/v1",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "NOTION_TOKEN"
       },
       "filters": {
@@ -51,7 +51,7 @@
       "specUrl": "https://raw.githubusercontent.com/stripe/openapi/master/openapi/spec3.json",
       "baseUrl": "https://api.stripe.com/v1",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "STRIPE_SECRET_KEY"
       },
       "filters": {
@@ -66,7 +66,7 @@
       "specUrl": "https://raw.githubusercontent.com/sendgrid/sendgrid-oai/main/oai.json",
       "baseUrl": "https://api.sendgrid.com/v3",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "SENDGRID_API_KEY"
       },
       "filters": {
@@ -81,7 +81,7 @@
       "specUrl": "https://raw.githubusercontent.com/Airtable/airtable.js/master/lib/airtable_api.json",
       "baseUrl": "https://api.airtable.com/v0",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "AIRTABLE_API_KEY"
       },
       "filters": {}
@@ -120,7 +120,7 @@
       "specFile": "./specs/hostinger-api.json",
       "baseUrl": "https://developers.hostinger.com",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "HOSTINGER_API_TOKEN"
       },
       "filters": {
@@ -167,7 +167,7 @@
       "specUrl": "https://dev.proof.com/openapi.json",
       "baseUrl": "https://dev.proof.com/api/v1",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "PROOF_API_KEY"
       },
       "filters": {
@@ -182,7 +182,7 @@
       "specUrl": "https://www.wix.com/_api/rest-docs/wix-rest-docs/openapi3_0.json",
       "baseUrl": "https://www.wixapis.com",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "WIX_API_KEY"
       },
       "filters": {
@@ -197,7 +197,7 @@
       "specUrl": "https://www.irs.gov/pub/irs-pdf/mef-openapi-spec.json",
       "baseUrl": "https://testbed.irs.gov/mef",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "IRS_API_KEY"
       },
       "filters": {
@@ -212,7 +212,7 @@
       "specUrl": "specs/adobe-pdf-services.yaml",
       "baseUrl": "https://pdf-services.adobe.io",
       "auth": {
-        "kind": "bearer",
+        "kind": "header",
         "env": "ADOBE_ACCESS_TOKEN"
       },
       "filters": {
@@ -222,12 +222,12 @@
     {
       "name": "unipile",
       "type": "openapi",
-      "specUrl": "https://api1.unipile.com:13111/api-json",
-      "baseUrl": "https://api1.unipile.com:13111/api/v1/",
+      "specUrl": "https://api15.unipile.com:14501/api-json",
+      "baseUrl": "https://api15.unipile.com:14501",
       "auth": {
-        "kind": "bearer",
-        "env": "UNIPILE_API_KEY",
-        "account_id": "UNIPILE_ACCOUNT_ID"
+        "kind": "header",
+        "name": "X-API-KEY",
+        "env": "UNIPILE_API_KEY"
       },
       "filters": {
         "includeTagsRe": [

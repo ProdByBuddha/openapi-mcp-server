@@ -26,7 +26,7 @@
   ],
   "scripts": {
     "setup-mcp": "./install-mcp.sh",
-    "start": "node examples/mcp-n8n-server.js",
+    "start": "npx @dotenvx/dotenvx run -- node examples/mcp-n8n-server.js",
     "test": "node tests/run-all.js",
     "test:all": "npm run test",
     "dev": "nodemon examples/mcp-n8n-server.js",
@@ -37,11 +37,11 @@
     "n8n:dump": "node examples/n8n-workflows-cli.js dump-all",
     "n8n:activate": "node examples/n8n-workflows-cli.js activate",
     "n8n:deactivate": "node examples/n8n-workflows-cli.js deactivate",
-    "mcp:n8n": "node examples/mcp-n8n-server.js",
+    "mcp:n8n": "npx @dotenvx/dotenvx run -- node examples/mcp-n8n-server.js",
     "mcp:n8n:once": "node examples/mcp-n8n-server.js --once",
-    "mcp:openapi": "node examples/mcp-openapi-server.js",
+    "mcp:openapi": "npx @dotenvx/dotenvx run -- node examples/mcp-openapi-server.js",
     "mcp:openapi:once": "node examples/mcp-openapi-server.js --once",
-    "mcp:hostinger": "node examples/mcp-hostinger-server.js",
+    "mcp:hostinger": "npx @dotenvx/dotenvx run -- node examples/mcp-hostinger-server.js",
     "mcp:hostinger:once": "node examples/mcp-hostinger-server.js --once",
     "mcp:gen": "node examples/generate-openapi-mcp-tools.js",
     "mcp:gen:tools": "node examples/generate-openapi-mcp-tools.js",
@@ -77,14 +77,16 @@
   "author": "Billy Coleman III",
   "license": "MIT",
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.49.0",
     "body-parser": "^2.2.0",
     "dotenv": "^16.4.5",
     "express": "^5.1.0",
+    "soap": "^0.45.0",
     "swagger-parser": "^10.0.3",
     "swagger-spec-validator": "^5.0.0",
+    "ws": "^8.18.3",
     "yaml": "^2.8.1",
-    "zod": "^3.22.4",
-    "soap": "^0.45.0"
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"

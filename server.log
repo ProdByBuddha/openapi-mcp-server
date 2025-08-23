@@ -1,0 +1,18 @@
+[github] Loaded 483 tools
+[slack] Skipping service: Missing environment variable: SLACK_BOT_TOKEN
+[notion] Skipping service: Missing environment variable: NOTION_TOKEN
+[stripe] Skipping service: Missing environment variable: STRIPE_SECRET_KEY
+[sendgrid] Skipping service: Missing environment variable: SENDGRID_API_KEY
+[airtable] Skipping service: Missing environment variable: AIRTABLE_API_KEY
+[docker] Loaded 54 tools
+[n8n] Loaded 40 tools
+[hostinger] Loaded 94 tools
+[usps] Skipping service: Missing environment variable: USPS_USER_ID
+[lob] Loaded 16 tools
+[proof] Skipping service: Missing environment variable: PROOF_API_KEY
+[wix] Skipping service: Missing environment variable: WIX_API_KEY
+[irs] Skipping service: Missing environment variable: IRS_API_KEY
+[adobe_pdf] Skipping service: Missing environment variable: ADOBE_ACCESS_TOKEN
+[unipile] Loaded 84 tools
+[multi-host] HTTP listening on 3005
+[multi-host] All HTTP transports started successfully

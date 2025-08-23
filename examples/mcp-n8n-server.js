@@ -21,23 +21,13 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 
-// Load .env if present (minimal loader)
+// Load environment variables (dotenvx recommended)
 try {
-  const envPath = path.resolve(process.cwd(), '.env');
-  if (fs.existsSync(envPath)) {
-    const lines = fs.readFileSync(envPath, 'utf8').split(/\r?\n/);
-    for (const line of lines) {
-      const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
-      if (!m) continue;
-      const key = m[1];
-      let val = m[2];
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-        val = val.slice(1, -1);
-      }
-      if (!process.env[key]) process.env[key] = val;
-    }
-  }
-} catch (_) { }
+  require('@dotenvx/dotenvx').config({ quiet: true });
+} catch (_) {
+  // Fallback to basic dotenv
+  try { require('dotenv').config(); } catch (_) { }
+}
 
 const BASE_URL = process.env.N8N_API_URL || 'http://localhost:5678/rest';
 const DRY_RUN = /^(1|true|yes)$/i.test(String(process.env.N8N_MCP_DRY_RUN || ''));
@@ -334,13 +324,13 @@ try {
             res.on('data', (c) => (body += c));
             res.on('end', () => {
               // Try JSON first
-              try { resolve(JSON.parse(body)); return; } catch (_) {}
+              try { resolve(JSON.parse(body)); return; } catch (_) { }
               // Try YAML if available
               try {
                 const YAML = require('yaml');
                 resolve(YAML.parse(body));
                 return;
-              } catch (_) {}
+              } catch (_) { }
               reject(new Error('OPENAPI_SPEC_URL did not return a parseable spec (JSON/YAML)'));
             });
           });

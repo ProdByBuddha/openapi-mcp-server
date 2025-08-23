@@ -18,19 +18,13 @@ const path = require('path');
 const https = require('https');
 const http = require('http');
 
-// Minimal .env loader
-try {
-  const envPath = path.resolve(process.cwd(), '.env');
-  if (fs.existsSync(envPath)) {
-    for (const line of fs.readFileSync(envPath, 'utf8').split(/\r?\n/)) {
-      const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
-      if (!m) continue;
-      const key = m[1]; let val = m[2];
-      if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) val = val.slice(1, -1);
-      if (!process.env[key]) process.env[key] = val;
-    }
-  }
-} catch (_) {}
+// Load environment variables (dotenvx recommended)
+try { 
+  require('@dotenvx/dotenvx').config({ quiet: true }); 
+} catch (_) {
+  // Fallback to basic dotenv
+  try { require('dotenv').config(); } catch (_) {}
+}
 
 const tools = [];
 let hostingerSdk = null;

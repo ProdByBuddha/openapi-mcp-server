@@ -2,8 +2,10 @@
 const fs = require('fs');
 const path = require('path');
 const { spawnSync, execSync } = require('child_process');
-let dotenv;
-try { dotenv = require('dotenv'); } catch (_) { dotenv = null; }
+let dotenvx;
+try { dotenvx = require('@dotenvx/dotenvx'); } catch (_) { 
+  try { dotenvx = require('dotenv'); } catch (_) { dotenvx = null; }
+}
 
 const dir = __dirname;
 
@@ -40,9 +42,9 @@ const envCandidates = [
 ];
 for (const p of envCandidates) {
   if (fs.existsSync(p)) {
-    if (dotenv) {
-      const res = dotenv.config({ path: p, override: false });
-      if (!res.error) console.log(`dotenv loaded: ${p}`);
+    if (dotenvx) {
+      const res = dotenvx.config({ path: p, override: false });
+      if (!res.error) console.log(`dotenvx loaded: ${p}`);
     }
     loadEnvFile(p);
   }
