@@ -20,12 +20,17 @@
  *   - OPENAPI_BASIC_USER / OPENAPI_BASIC_PASS
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import { fileURLToPath } from 'url';
 
-const { generateMcpTools } = require('../lib/openapi-generator');
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { generateMcpTools } = await import('../lib/openapi-generator/index.js');
 
 function readEnvFileIfPresent() {
   try {
@@ -144,7 +149,18 @@ async function loadOpenApiSpec() {
   const SPEC_URL = process.env.OPENAPI_SPEC_URL || '';
   if (SPEC_FILE) {
     const raw = fs.readFileSync(path.resolve(process.cwd(), SPEC_FILE), 'utf8');
-    return JSON.parse(raw);
+    try {
+      // Try JSON first
+      return JSON.parse(raw);
+    } catch (_) {
+      // Try YAML
+      try {
+        const YAML = await import('yaml');
+        return YAML.parse(raw);
+      } catch (_) {
+        throw new Error('OPENAPI_SPEC_FILE must be a valid JSON or YAML file');
+      }
+    }
   }
   if (SPEC_URL) {
     return await new Promise((resolve, reject) => {
@@ -162,11 +178,15 @@ async function loadOpenApiSpec() {
           let body = '';
           res.setEncoding('utf8');
           res.on('data', (c) => (body += c));
-        res.on('end', () => {
+        res.on('end', async () => {
           // Try JSON first
           try { resolve(JSON.parse(body)); return; } catch (_) {}
           // Try YAML if available
-          try { const YAML = require('yaml'); resolve(YAML.parse(body)); return; } catch (_) {}
+          try { 
+            const YAML = await import('yaml'); 
+            resolve(YAML.parse(body)); 
+            return; 
+          } catch (_) {}
           // Try to extract swaggerDoc JSON from a JS init file (e.g., Swagger UI init)
           try {
             const idx = body.indexOf('"swaggerDoc"');

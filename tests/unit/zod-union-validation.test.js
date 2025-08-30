@@ -1,9 +1,14 @@
-const assert = require('assert');
-const path = require('path');
-const fs = require('fs');
-const { spawn, execSync } = require('child_process');
+import assert from 'assert';
+import path from 'path';
+import fs from 'fs';
+import { spawn, execSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
-const { generateMcpServer } = require('../../lib/openapi-generator/server-generator');
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { generateMcpServer } = await import('../../lib/openapi-generator/server-generator.js');
 
 function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -26,7 +31,8 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
     process.env.OPENAPI_MCP_ALLOWED_PATHS = '/union-*';
     process.env.OPENAPI_MCP_ALLOWED_METHODS = 'GET,POST,PUT,PATCH,DELETE';
     process.env.DEBUG_HTTP = '1';
-    const tools = require(path.join(outDir, 'tools.js')).tools;
+    const toolsModule = await import(path.join(outDir, 'tools.js'));
+    const tools = toolsModule.tools;
     const byName = Object.fromEntries(tools.map((t) => [t.name, t]));
 
     // anyOf: valid input (a: string)

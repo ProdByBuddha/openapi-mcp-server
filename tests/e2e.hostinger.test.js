@@ -1,6 +1,11 @@
 // E2E for Hostinger MCP (skips without HOSTINGER_API_TOKEN)
 import { spawn } from 'child_process';
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function log(msg) { process.stdout.write(msg + '\n'); }
 

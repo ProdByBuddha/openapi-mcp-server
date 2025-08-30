@@ -20,6 +20,7 @@ import fs from 'fs';
 import path from 'path';
 import https from 'https';
 import http from 'http';
+import net from 'net';
 import express from 'express';
 import bodyParser from 'body-parser';
 import { fileURLToPath } from 'url';
@@ -59,6 +60,27 @@ try {
 
 function parseArgs(argv){ const o={}; for(let i=0;i<argv.length;i++){ const t=argv[i]; if(t.startsWith('--')){ const k=t.slice(2); const v=argv[i+1]&&!argv[i+1].startsWith('--')?argv[++i]:'true'; o[k]=v;} } return o; }
 
+// Dynamic port finder
+async function findAvailablePort(startPort = 3000, maxAttempts = 100) {
+  for (let port = startPort; port < startPort + maxAttempts; port++) {
+    if (await isPortAvailable(port)) {
+      return port;
+    }
+  }
+  throw new Error(`No available port found in range ${startPort}-${startPort + maxAttempts}`);
+}
+
+function isPortAvailable(port) {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.listen(port, () => {
+      server.once('close', () => resolve(true));
+      server.close();
+    });
+    server.on('error', () => resolve(false));
+  });
+}
+
 function expandEnv(value) {
   if (typeof value !== 'string') return value;
   return value.replace(/\$\{([^}]+)\}/g, (_, key) => {
@@ -68,68 +90,7 @@ ${'{'}${key}}`;
   });
 }
 
-async function httpGetJson(urlString, headers = {}) {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => {
-      reject(new Error(`Request timeout after 10 seconds for ${urlString}`));
-    }, 10000);
 
-    try {
-      const u = new URL(urlString);
-      const lib = u.protocol === 'https:' ? https : http;
-      const req = lib.request({
-        protocol: u.protocol,
-        hostname: u.hostname,
-        port: u.port || (u.protocol === 'https:' ? 443 : 80),
-        path: u.pathname + u.search,
-        method: 'GET',
-        timeout: 10000,
-        headers: Object.assign({ Accept: 'application/json, application/yaml, text/javascript, application/javascript' }, headers)
-      }, (res) => {
-        clearTimeout(timeout);
-        let body = '';
-        res.setEncoding('utf8');
-        res.on('data', (c)=> body+=c);
-        res.on('end',async ()=>{
-          if (urlString.endsWith('.js')) {
-            try {
-              const jsonp = body.substring(body.indexOf('{'), body.lastIndexOf('}') + 1);
-              resolve(JSON.parse(jsonp));
-              return;
-            } catch (e) {
-              reject(new Error(`Failed to parse JSON from JS file: ${e.message}`));
-              return;
-            }
-          }
-          // Try JSON first
-          try { resolve(JSON.parse(body)); return; } catch (_) {}
-          // Try YAML if available
-          try { 
-            const YAML = await import('yaml');
-            const yamlModule = YAML.default || YAML;
-            resolve(yamlModule.parse(body)); 
-            return; 
-          } catch (_) {}
-          // If neither works, reject with more specific error
-          reject(new Error(`Response is not valid JSON or YAML. Content-Type: ${res.headers['content-type']}, Status: ${res.statusCode}`));
-        });
-      });
-      req.on('error', (err) => {
-        clearTimeout(timeout);
-        reject(err);
-      });
-      req.on('timeout', () => {
-        clearTimeout(timeout);
-        req.destroy();
-        reject(new Error(`Request timeout for ${urlString}`));
-      });
-      req.end();
-    } catch (err) {
-      clearTimeout(timeout);
-      reject(err);
-    }
-  });
-}
 
 // --- Auto-discovery helpers for docs pages (Swagger UI / Redoc / Stoplight) and WSDL ---
 function resolveUrl(base, maybe) { try { return new URL(maybe, base).toString(); } catch { return null; } }
@@ -345,10 +306,10 @@ async function main() {
   const transportPromises = [];
   
   if (transports.includes('http')) {
-    transportPromises.push(new Promise((resolve, reject) => {
+    transportPromises.push(new Promise(async (resolve, reject) => {
       try {
         const app = express();
-        app.use(bodyParser.json());
+        app.use(express.json());
         app.post('/mcp', async (req, res) => {
           try {
             const { method, params } = req.body || {};
@@ -360,7 +321,8 @@ async function main() {
             return res.status(400).json({ error: 'Unknown method' });
           } catch (e) { return res.status(500).json({ error: e.message }); }
         });
-        const port = args.port || process.env.PORT || 3005;
+        const requestedPort = args.port || process.env.PORT || 3005;
+        const port = await findAvailablePort(parseInt(requestedPort));
         const server = app.listen(port, () => {
           console.log(`[multi-host] HTTP listening on ${port}`);
           resolve();
@@ -373,18 +335,19 @@ async function main() {
   }
 
   if (transports.includes('sse')) {
-    transportPromises.push(new Promise((resolve, reject) => {
+    transportPromises.push(new Promise(async (resolve, reject) => {
       try {
         const app = express();
         app.use(bodyParser.json());
-        app.get('/mcp-sse', (req, res) => {
+        app.get('/mcp-sse', (_req, res) => {
           res.setHeader('Content-Type', 'text/event-stream');
           res.setHeader('Cache-Control', 'no-cache');
           res.setHeader('Connection', 'keep-alive');
           const send = (data) => res.write(`data: ${JSON.stringify(data)}\n\n`);
           send({ message: 'MCP SSE connection established.' });
         });
-        const port = args.ssePort || process.env.SSE_PORT || 3006;
+        const requestedPort = args.ssePort || process.env.SSE_PORT || 3006;
+        const port = await findAvailablePort(parseInt(requestedPort));
         const server = app.listen(port, () => {
           console.log(`[multi-host] SSE listening on ${port}`);
           resolve();
@@ -404,7 +367,7 @@ async function main() {
     transportPromises.push(new Promise((resolve, reject) => {
       try {
         const app = express();
-        app.use(bodyParser.json());
+        app.use(express.json());
         const port = args.wsPort || process.env.WS_PORT || 3007;
         const server = app.listen(port, () => {
           console.log(`[multi-host] WS listening on ${port}`);
@@ -494,12 +457,12 @@ async function maybeOnce() {
 }
 
 (async () => {
-  // Always load services first
-  await loadServices();
-  
-  // Then check if this is a --once call
+  // Check if this is a --once call first
   if (await maybeOnce()) return;
   
-  // Otherwise run the main transport loop
+  // Load services for normal operation
+  await loadServices();
+  
+  // Run the main transport loop
   await main();
 })().catch((e)=>{ console.error('Fatal:', e.message); process.exit(1); });

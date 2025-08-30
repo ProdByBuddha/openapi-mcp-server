@@ -37,7 +37,12 @@ try {
 
 const tools = [];
 let hostingerSdk = null;
-try { hostingerSdk = require('hostinger-api-sdk'); } catch (_) { hostingerSdk = null; }
+try { 
+  const hostingerModule = await import('hostinger-api-sdk'); 
+  hostingerSdk = hostingerModule.default || hostingerModule; 
+} catch (_) { 
+  hostingerSdk = null; 
+}
 
 async function httpGetJson(urlString, headers = {}) {
   return new Promise((resolve, reject) => {
@@ -80,7 +85,7 @@ async function loadOpenApiSpec() {
 }
 
 async function loadTools() {
-  const { generateMcpTools } = require('../lib/openapi-generator');
+  const { generateMcpTools } = await import('../lib/openapi-generator/index.js');
   const spec = await loadOpenApiSpec();
   const apiBase = process.env.HOSTINGER_API_URL || (spec.servers && spec.servers[0] && spec.servers[0].url) || '';
   const token = process.env.HOSTINGER_API_TOKEN || '';

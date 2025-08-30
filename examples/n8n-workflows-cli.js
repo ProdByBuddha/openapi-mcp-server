@@ -11,10 +11,10 @@
  *   npm run n8n:dump -- --out-dir data/workflows
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
 
 const BASE_URL = process.env.N8N_API_URL || 'http://localhost:5678/rest';
 

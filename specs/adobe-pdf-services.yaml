@@ -194,7 +194,6 @@ paths:
       tags: [Jobs]
       parameters:
         - $ref: '#/components/parameters/XApiKey'
-      parameters:
         - in: path
           name: jobId
           required: true

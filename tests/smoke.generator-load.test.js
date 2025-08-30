@@ -2,6 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
 import { spawnSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import { generateMcpTools } from '../lib/openapi-generator/index.js';
 

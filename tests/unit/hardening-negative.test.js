@@ -1,9 +1,14 @@
-const assert = require('assert');
-const path = require('path');
-const fs = require('fs');
-const { spawn, execSync } = require('child_process');
+import assert from 'assert';
+import path from 'path';
+import fs from 'fs';
+import { spawn, execSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
-const { generateMcpServer } = require('../../lib/openapi-generator/server-generator');
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { generateMcpServer } = await import('../../lib/openapi-generator/server-generator.js');
 
 function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
@@ -27,8 +32,9 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
       for (const k of ['OPENAPI_MCP_ALLOWED_PATHS','OPENAPI_MCP_ALLOWED_METHODS','OPENAPI_MCP_RATE_LIMIT','OPENAPI_MCP_RATE_WINDOW_MS']) {
         if (env[k] !== undefined) process.env[k] = env[k]; else delete process.env[k];
       }
-      delete require.cache[require.resolve(toolsPath)];
-      const tools = require(toolsPath).tools;
+      // For ES modules, we need to use dynamic import with a cache-busting query
+      const toolsModule = await import(`${toolsPath}?t=${Date.now()}`);
+      const tools = toolsModule.tools;
       return Object.fromEntries(tools.map((t) => [t.name, t]));
     };
 

@@ -47,3 +47,5 @@ analysis/
 analysis/*
 
 .vscode
+
+*.patch

@@ -15,10 +15,10 @@
  *   - OPENAPI_MCP_RATE_LIMIT, OPENAPI_MCP_CONCURRENCY*
  */
 
-const { spawn } = require('child_process');
-const http = require('http');
-const https = require('https');
-const { URL } = require('url');
+import { spawn } from 'child_process';
+import http from 'http';
+import https from 'https';
+import { URL } from 'url';
 
 function logDebug(...a) { if (/^(1|true|yes)$/i.test(String(process.env.DEBUG_DOCKER || ''))) console.log('[docker]', ...a); }
 

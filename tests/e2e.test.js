@@ -2,11 +2,25 @@
 // Skips if N8N_API_URL or N8N_API_KEY are not set
 
 import { spawn } from 'child_process';
-const path = require('path');
-const fs = require('fs');
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 let dotenvx;
-try { dotenvx = require('@dotenvx/dotenvx'); } catch (_) { 
-  try { dotenvx = require('dotenv'); } catch (_) { dotenvx = null; }
+try { 
+  const dotenvxModule = await import('@dotenvx/dotenvx');
+  dotenvx = dotenvxModule.default || dotenvxModule;
+} catch (_) { 
+  try { 
+    const dotenvModule = await import('dotenv');
+    dotenvx = dotenvModule.default || dotenvModule;
+  } catch (_) { 
+    dotenvx = null; 
+  }
 }
 
 // Minimal .env loader (same logic as run-all.js)

@@ -1,9 +1,14 @@
-const assert = require('assert');
-const path = require('path');
-const fs = require('fs');
-const { spawn } = require('child_process');
+import assert from 'assert';
+import path from 'path';
+import fs from 'fs';
+import { spawn } from 'child_process';
+import { fileURLToPath } from 'url';
 
-const { generateMcpTools } = require('../../lib/openapi-generator');
+// Get __dirname equivalent for ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { generateMcpTools } = await import('../../lib/openapi-generator/index.js');
 
 function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
 

@@ -1,0 +1,2518 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OpenAPI MCP Server Configuration Schema",
+  "description": "Configuration schema for the OpenAPI MCP Server with all supported environment variables",
+  "type": "object",
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "generatedAt": {
+          "type": "string",
+          "default": "2025-08-30T00:51:18.158Z"
+        },
+        "generator": {
+          "type": "string",
+          "const": "openapi-mcp-server/config-schema-generator"
+        },
+        "version": {
+          "type": "string"
+        },
+        "totalVariables": {
+          "type": "integer",
+          "default": 58
+        },
+        "categories": {
+          "type": "array",
+          "default": [
+            "configuration",
+            "authentication",
+            "n8n",
+            "docker",
+            "endpoints",
+            "security",
+            "files",
+            "openapi",
+            "general"
+          ]
+        }
+      }
+    },
+    "services": {
+      "type": "object",
+      "description": "Service-specific configuration schemas",
+      "properties": {
+        "n8n": {
+          "type": "object",
+          "title": "n8n",
+          "description": "n8n workflow automation platform",
+          "properties": {
+            "required": {
+              "type": "object",
+              "title": "Required Configuration",
+              "properties": {
+                "N8N_API_KEY": {
+                  "type": "string",
+                  "title": "N8N_API_KEY",
+                  "description": "API key for service authentication (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_n8n_api_key_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "lib/openapi-generator/index.js",
+                      "lib/openapi-generator/index.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/multi-host-README.md",
+                      "examples/n8n-workflows-cli.js",
+                      "examples/n8n-workflows-cli.js",
+                      "examples/scripts/generate-openapi-mcp-tools.js",
+                      "examples/scripts/generate-openapi-mcp-tools.js",
+                      "examples/scripts/test-oauth2.js",
+                      "examples/usage/n8n/automation-examples.md",
+                      "examples/usage/n8n/automation-examples.md",
+                      "tests/e2e.test.js",
+                      "tests/e2e.test.js",
+                      "tests/run-all.js"
+                    ],
+                    "occurrences": 15
+                  },
+                  "sensitive": true
+                },
+                "N8N_API_URL": {
+                  "type": "string",
+                  "title": "N8N_API_URL",
+                  "description": "Service endpoint URL",
+                  "format": "uri",
+                  "examples": [
+                    "https://your-n8n-instance.com/api/v1"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/n8n-workflows-cli.js",
+                      "examples/scripts/generate-openapi-mcp-tools.js",
+                      "examples/scripts/generate-openapi-mcp-tools.js",
+                      "examples/scripts/generate-tool-schemas.js",
+                      "examples/scripts/spec-gate.js",
+                      "examples/usage/n8n/automation-examples.md",
+                      "examples/usage/n8n/automation-examples.md",
+                      "tests/e2e.test.js",
+                      "tests/e2e.test.js",
+                      "tests/run-all.js",
+                      "tests/run-all.js"
+                    ],
+                    "occurrences": 13
+                  }
+                }
+              },
+              "required": [
+                "N8N_API_KEY",
+                "N8N_API_URL"
+              ]
+            },
+            "optional": {
+              "type": "object",
+              "title": "Optional Configuration",
+              "properties": {
+                "N8N_BEARER_TOKEN": {
+                  "type": "string",
+                  "title": "N8N_BEARER_TOKEN",
+                  "description": "Bearer token for authorization (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_n8n_bearer_token_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "lib/openapi-generator/index.js",
+                      "lib/openapi-generator/index.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/n8n-workflows-cli.js",
+                      "examples/n8n-workflows-cli.js",
+                      "tests/e2e.test.js"
+                    ],
+                    "occurrences": 7
+                  },
+                  "sensitive": true
+                },
+                "N8N_BASIC_AUTH_USER": {
+                  "type": "string",
+                  "title": "N8N_BASIC_AUTH_USER",
+                  "description": "basic auth user for n8n workflow automation platform (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_n8n_basic_auth_user_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "lib/openapi-generator/index.js",
+                      "lib/openapi-generator/index.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/n8n-workflows-cli.js",
+                      "examples/n8n-workflows-cli.js"
+                    ],
+                    "occurrences": 6
+                  },
+                  "sensitive": true
+                },
+                "N8N_BASIC_AUTH_PASS": {
+                  "type": "string",
+                  "title": "N8N_BASIC_AUTH_PASS",
+                  "description": "basic auth pass for n8n workflow automation platform (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_n8n_basic_auth_pass_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "lib/openapi-generator/index.js",
+                      "lib/openapi-generator/index.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-n8n-server.js",
+                      "examples/n8n-workflows-cli.js",
+                      "examples/n8n-workflows-cli.js"
+                    ],
+                    "occurrences": 6
+                  },
+                  "sensitive": true
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "N8N_API_KEY": "n8n_api_1234567890abcdef",
+              "N8N_API_URL": "https://your-n8n-instance.com/api/v1",
+              "N8N_BEARER_TOKEN": "your_bearer_token_here"
+            }
+          ]
+        },
+        "hostinger": {
+          "type": "object",
+          "title": "Hostinger",
+          "description": "Hostinger cloud hosting and domain management",
+          "properties": {
+            "required": {
+              "type": "object",
+              "title": "Required Configuration",
+              "properties": {
+                "HOSTINGER_API_TOKEN": {
+                  "type": "string",
+                  "title": "HOSTINGER_API_TOKEN",
+                  "description": "Service hostname (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_hostinger_api_token_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-hostinger-server.js",
+                      "examples/multi-host-README.md",
+                      "examples/usage/hostinger/automation-examples.md",
+                      "examples/usage/hostinger/automation-examples.md",
+                      "tests/e2e.hostinger.test.js"
+                    ],
+                    "occurrences": 5
+                  },
+                  "sensitive": true
+                }
+              },
+              "required": [
+                "HOSTINGER_API_TOKEN"
+              ]
+            },
+            "optional": {
+              "type": "object",
+              "title": "Optional Configuration",
+              "properties": {
+                "HOSTINGER_PROFILE": {
+                  "type": "string",
+                  "title": "HOSTINGER_PROFILE",
+                  "description": "Service hostname",
+                  "pattern": "^[^\\0]+$",
+                  "examples": [
+                    "curated"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-hostinger-server.js"
+                    ],
+                    "occurrences": 1
+                  }
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "HOSTINGER_API_TOKEN": "your_hostinger_api_token_here",
+              "HOSTINGER_PROFILE": "curated"
+            }
+          ]
+        },
+        "adobe_pdf": {
+          "type": "object",
+          "title": "Adobe PDF Services",
+          "description": "Adobe PDF Services for document processing",
+          "properties": {
+            "required": {
+              "type": "object",
+              "title": "Required Configuration",
+              "properties": {
+                "ADOBE_ACCESS_TOKEN": {
+                  "type": "string",
+                  "title": "ADOBE_ACCESS_TOKEN",
+                  "description": "Access token for API authentication (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_adobe_access_token_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/usage/adobe_pdf/automation-examples.md",
+                      "examples/usage/adobe_pdf/automation-examples.md"
+                    ],
+                    "occurrences": 2
+                  },
+                  "sensitive": true
+                }
+              },
+              "required": [
+                "ADOBE_ACCESS_TOKEN"
+              ]
+            },
+            "optional": {
+              "type": "object",
+              "title": "Optional Configuration",
+              "properties": {}
+            }
+          },
+          "examples": [
+            {
+              "ADOBE_ACCESS_TOKEN": "your_adobe_access_token_here"
+            }
+          ]
+        },
+        "docker": {
+          "type": "object",
+          "title": "Docker",
+          "description": "Docker container and image management",
+          "properties": {
+            "required": {
+              "type": "object",
+              "title": "Required Configuration",
+              "properties": {},
+              "required": []
+            },
+            "optional": {
+              "type": "object",
+              "title": "Optional Configuration",
+              "properties": {
+                "DOCKER_ALLOW_RUN": {
+                  "type": "array",
+                  "title": "DOCKER_ALLOW_RUN",
+                  "description": "allow run for Docker container and image management",
+                  "examples": [
+                    "1"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-docker-server.js"
+                    ],
+                    "occurrences": 1
+                  }
+                },
+                "DOCKER_ALLOWED_IMAGES": {
+                  "type": "array",
+                  "title": "DOCKER_ALLOWED_IMAGES",
+                  "description": "Allowed items list",
+                  "examples": [
+                    "nginx,redis,postgres"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-docker-server.js"
+                    ],
+                    "occurrences": 1
+                  }
+                },
+                "DEBUG_DOCKER": {
+                  "type": "boolean",
+                  "title": "DEBUG_DOCKER",
+                  "description": "Enable debug mode",
+                  "examples": [
+                    "1"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-docker-server.js"
+                    ],
+                    "occurrences": 1
+                  }
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "DOCKER_HOST": "unix:///var/run/docker.sock",
+              "DOCKER_ALLOW_RUN": "1",
+              "DOCKER_ALLOWED_IMAGES": "nginx,redis,postgres",
+              "DEBUG_DOCKER": "1"
+            }
+          ]
+        },
+        "openapi": {
+          "type": "object",
+          "title": "Generic OpenAPI",
+          "description": "Generic OpenAPI service integration",
+          "properties": {
+            "required": {
+              "type": "object",
+              "title": "Required Configuration",
+              "properties": {
+                "OPENAPI_SPEC_URL": {
+                  "type": "string",
+                  "title": "OPENAPI_SPEC_URL",
+                  "description": "Service endpoint URL",
+                  "format": "uri",
+                  "examples": [
+                    "https://api.example.com/openapi.json"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-openapi-server.js"
+                    ],
+                    "occurrences": 2
+                  }
+                }
+              },
+              "required": [
+                "OPENAPI_SPEC_URL"
+              ]
+            },
+            "optional": {
+              "type": "object",
+              "title": "Optional Configuration",
+              "properties": {
+                "OPENAPI_SPEC_FILE": {
+                  "type": "string",
+                  "title": "OPENAPI_SPEC_FILE",
+                  "description": "File path",
+                  "pattern": "^[^\\0]+$",
+                  "examples": [
+                    "example_value"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-openapi-server.js"
+                    ],
+                    "occurrences": 2
+                  }
+                },
+                "OPENAPI_BASE_URL": {
+                  "type": "string",
+                  "title": "OPENAPI_BASE_URL",
+                  "description": "Service endpoint URL",
+                  "format": "uri",
+                  "examples": [
+                    "https://api.example.com"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-n8n-server.js",
+                      "examples/mcp-openapi-server.js",
+                      "examples/scripts/generate-openapi-mcp-tools.js",
+                      "examples/scripts/generate-openapi-mcp-tools.js",
+                      "examples/scripts/spec-gate.js",
+                      "tests/tmp/generated-hardening/tools.js",
+                      "tests/tmp/generated-union/tools.js"
+                    ],
+                    "occurrences": 7
+                  }
+                },
+                "OPENAPI_API_KEY": {
+                  "type": "string",
+                  "title": "OPENAPI_API_KEY",
+                  "description": "API key for service authentication (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_openapi_api_key_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-openapi-server.js"
+                    ],
+                    "occurrences": 1
+                  },
+                  "sensitive": true
+                },
+                "OPENAPI_BEARER_TOKEN": {
+                  "type": "string",
+                  "title": "OPENAPI_BEARER_TOKEN",
+                  "description": "Bearer token for authorization (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_openapi_bearer_token_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-openapi-server.js"
+                    ],
+                    "occurrences": 1
+                  },
+                  "sensitive": true
+                },
+                "OPENAPI_BASIC_USER": {
+                  "type": "string",
+                  "title": "OPENAPI_BASIC_USER",
+                  "description": "basic user for Generic OpenAPI service integration",
+                  "examples": [
+                    "example_value"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-openapi-server.js"
+                    ],
+                    "occurrences": 1
+                  }
+                },
+                "OPENAPI_BASIC_PASS": {
+                  "type": "string",
+                  "title": "OPENAPI_BASIC_PASS",
+                  "description": "basic pass for Generic OpenAPI service integration (sensitive - do not log or expose)",
+                  "examples": [
+                    "your_openapi_basic_pass_here"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-openapi-server.js"
+                    ],
+                    "occurrences": 1
+                  },
+                  "sensitive": true
+                },
+                "OPENAPI_MCP_ALLOWED_METHODS": {
+                  "type": "array",
+                  "title": "OPENAPI_MCP_ALLOWED_METHODS",
+                  "description": "Allowed items list",
+                  "examples": [
+                    "example_value"
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-openapi-server.js",
+                      "tests/tmp/generated-hardening/tools.js",
+                      "tests/tmp/generated-union/tools.js",
+                      "tests/unit/zod-union-validation.test.js"
+                    ],
+                    "occurrences": 4
+                  }
+                },
+                "OPENAPI_MCP_RATE_LIMIT": {
+                  "type": "integer",
+                  "title": "OPENAPI_MCP_RATE_LIMIT",
+                  "description": "Rate limit or item limit",
+                  "examples": [
+                    100,
+                    1000,
+                    10000
+                  ],
+                  "usage": {
+                    "files": [
+                      "examples/mcp-openapi-server.js",
+                      "tests/tmp/generated-hardening/tools.js",
+                      "tests/tmp/generated-union/tools.js"
+                    ],
+                    "occurrences": 3
+                  }
+                }
+              }
+            }
+          },
+          "examples": [
+            {
+              "OPENAPI_SPEC_URL": "https://api.example.com/openapi.json",
+              "OPENAPI_BASE_URL": "https://api.example.com",
+              "OPENAPI_API_KEY": "your_api_key_here",
+              "OPENAPI_BEARER_TOKEN": "your_bearer_token_here"
+            }
+          ]
+        }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "description": "Environment variable definitions",
+      "properties": {
+        "DEBUG_HTTP": {
+          "type": "boolean",
+          "title": "DEBUG_HTTP",
+          "description": "Enable debug mode",
+          "examples": [
+            "true",
+            "false",
+            "1",
+            "0"
+          ],
+          "usage": {
+            "files": [
+              "lib/openapi-generator/index.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "tests/tmp/generated-hardening/http-client.js",
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/http-client.js",
+              "tests/tmp/generated-union/tools.js",
+              "tests/unit/zod-union-validation.test.js"
+            ],
+            "occurrences": 7
+          }
+        },
+        "N8N_API_KEY": {
+          "type": "string",
+          "title": "N8N_API_KEY",
+          "description": "API key for service authentication (sensitive - do not log or expose)",
+          "examples": [
+            "your_n8n_api_key_here"
+          ],
+          "usage": {
+            "files": [
+              "lib/openapi-generator/index.js",
+              "lib/openapi-generator/index.js",
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-n8n-server.js",
+              "examples/multi-host-README.md",
+              "examples/n8n-workflows-cli.js",
+              "examples/n8n-workflows-cli.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "examples/scripts/test-oauth2.js",
+              "examples/usage/n8n/automation-examples.md",
+              "examples/usage/n8n/automation-examples.md",
+              "tests/e2e.test.js",
+              "tests/e2e.test.js",
+              "tests/run-all.js"
+            ],
+            "occurrences": 15
+          },
+          "sensitive": true
+        },
+        "N8N_BEARER_TOKEN": {
+          "type": "string",
+          "title": "N8N_BEARER_TOKEN",
+          "description": "Bearer token for authorization (sensitive - do not log or expose)",
+          "examples": [
+            "your_n8n_bearer_token_here"
+          ],
+          "usage": {
+            "files": [
+              "lib/openapi-generator/index.js",
+              "lib/openapi-generator/index.js",
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-n8n-server.js",
+              "examples/n8n-workflows-cli.js",
+              "examples/n8n-workflows-cli.js",
+              "tests/e2e.test.js"
+            ],
+            "occurrences": 7
+          },
+          "sensitive": true
+        },
+        "N8N_BASIC_AUTH_USER": {
+          "type": "string",
+          "title": "N8N_BASIC_AUTH_USER",
+          "description": "basic auth user for n8n workflow automation platform (sensitive - do not log or expose)",
+          "examples": [
+            "your_n8n_basic_auth_user_here"
+          ],
+          "usage": {
+            "files": [
+              "lib/openapi-generator/index.js",
+              "lib/openapi-generator/index.js",
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-n8n-server.js",
+              "examples/n8n-workflows-cli.js",
+              "examples/n8n-workflows-cli.js"
+            ],
+            "occurrences": 6
+          },
+          "sensitive": true
+        },
+        "N8N_BASIC_AUTH_PASS": {
+          "type": "string",
+          "title": "N8N_BASIC_AUTH_PASS",
+          "description": "basic auth pass for n8n workflow automation platform (sensitive - do not log or expose)",
+          "examples": [
+            "your_n8n_basic_auth_pass_here"
+          ],
+          "usage": {
+            "files": [
+              "lib/openapi-generator/index.js",
+              "lib/openapi-generator/index.js",
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-n8n-server.js",
+              "examples/n8n-workflows-cli.js",
+              "examples/n8n-workflows-cli.js"
+            ],
+            "occurrences": 6
+          },
+          "sensitive": true
+        },
+        "DEBUG_DOCKER": {
+          "type": "boolean",
+          "title": "DEBUG_DOCKER",
+          "description": "Enable debug mode",
+          "examples": [
+            "1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "DOCKER_SOCK": {
+          "type": "string",
+          "title": "DOCKER_SOCK",
+          "description": "sock for Docker container and image management",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js",
+              "tests/e2e.docker-version.test.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "DOCKER_API_HOST": {
+          "type": "string",
+          "title": "DOCKER_API_HOST",
+          "description": "Service hostname",
+          "examples": [
+            "localhost",
+            "api.example.com",
+            "127.0.0.1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js",
+              "tests/e2e.docker-version.test.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "DOCKER_BIN": {
+          "type": "string",
+          "title": "DOCKER_BIN",
+          "description": "bin for Docker container and image management",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "DOCKER_COMPOSE_BIN": {
+          "type": "string",
+          "title": "DOCKER_COMPOSE_BIN",
+          "description": "compose bin for Docker container and image management",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "DOCKER_ALLOW_RUN": {
+          "type": "array",
+          "title": "DOCKER_ALLOW_RUN",
+          "description": "allow run for Docker container and image management",
+          "examples": [
+            "1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "DOCKER_ALLOWED_IMAGES": {
+          "type": "array",
+          "title": "DOCKER_ALLOWED_IMAGES",
+          "description": "Allowed items list",
+          "examples": [
+            "nginx,redis,postgres"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-docker-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_SPEC_FILE": {
+          "type": "string",
+          "title": "HOSTINGER_SPEC_FILE",
+          "description": "Service hostname",
+          "examples": [
+            "localhost",
+            "api.example.com",
+            "127.0.0.1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_SPEC_URL": {
+          "type": "string",
+          "title": "HOSTINGER_SPEC_URL",
+          "description": "Service endpoint URL",
+          "examples": [
+            "https://api.example.com",
+            "http://localhost:3000"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_API_URL": {
+          "type": "string",
+          "title": "HOSTINGER_API_URL",
+          "description": "Service endpoint URL",
+          "format": "uri",
+          "examples": [
+            "https://api.example.com",
+            "http://localhost:3000"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_API_TOKEN": {
+          "type": "string",
+          "title": "HOSTINGER_API_TOKEN",
+          "description": "Service hostname (sensitive - do not log or expose)",
+          "examples": [
+            "your_hostinger_api_token_here"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js",
+              "examples/multi-host-README.md",
+              "examples/usage/hostinger/automation-examples.md",
+              "examples/usage/hostinger/automation-examples.md",
+              "tests/e2e.hostinger.test.js"
+            ],
+            "occurrences": 5
+          },
+          "sensitive": true
+        },
+        "HOSTINGER_USE_SDK": {
+          "type": "string",
+          "title": "HOSTINGER_USE_SDK",
+          "description": "Service hostname",
+          "examples": [
+            "localhost",
+            "api.example.com",
+            "127.0.0.1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_PROFILE": {
+          "type": "string",
+          "title": "HOSTINGER_PROFILE",
+          "description": "Service hostname",
+          "pattern": "^[^\\0]+$",
+          "examples": [
+            "curated"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_INCLUDE_RAW": {
+          "type": "array",
+          "title": "HOSTINGER_INCLUDE_RAW",
+          "description": "Service hostname",
+          "examples": [
+            "localhost",
+            "api.example.com",
+            "127.0.0.1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "HOSTINGER_ALLOW_RAW": {
+          "type": "array",
+          "title": "HOSTINGER_ALLOW_RAW",
+          "description": "Service hostname",
+          "examples": [
+            "localhost",
+            "api.example.com",
+            "127.0.0.1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-hostinger-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "PORT": {
+          "type": "integer",
+          "title": "PORT",
+          "description": "Service port number",
+          "examples": [
+            3000,
+            8080,
+            5432
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-multi-host.js",
+              "tests/tmp/generated-hardening/index.js",
+              "tests/tmp/generated-hardening/index.js",
+              "tests/tmp/generated-hardening/index.js",
+              "tests/tmp/generated-union/index.js",
+              "tests/tmp/generated-union/index.js",
+              "tests/tmp/generated-union/index.js",
+              "tests/tmp/union-server.js"
+            ],
+            "occurrences": 8
+          }
+        },
+        "SSE_PORT": {
+          "type": "integer",
+          "title": "SSE_PORT",
+          "description": "Service port number",
+          "examples": [
+            3000,
+            8080,
+            5432
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-multi-host.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "WS_PORT": {
+          "type": "integer",
+          "title": "WS_PORT",
+          "description": "Service port number",
+          "examples": [
+            3000,
+            8080,
+            5432
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-multi-host.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_API_URL": {
+          "type": "string",
+          "title": "N8N_API_URL",
+          "description": "Service endpoint URL",
+          "format": "uri",
+          "examples": [
+            "https://your-n8n-instance.com/api/v1"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-n8n-server.js",
+              "examples/n8n-workflows-cli.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "examples/scripts/generate-tool-schemas.js",
+              "examples/scripts/spec-gate.js",
+              "examples/usage/n8n/automation-examples.md",
+              "examples/usage/n8n/automation-examples.md",
+              "tests/e2e.test.js",
+              "tests/e2e.test.js",
+              "tests/run-all.js",
+              "tests/run-all.js"
+            ],
+            "occurrences": 13
+          }
+        },
+        "N8N_MCP_DRY_RUN": {
+          "type": "array",
+          "title": "N8N_MCP_DRY_RUN",
+          "description": "mcp dry run for n8n workflow automation platform",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_ALLOWED_METHODS": {
+          "type": "array",
+          "title": "N8N_MCP_ALLOWED_METHODS",
+          "description": "Allowed items list",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_ALLOWED_PATHS": {
+          "type": "integer",
+          "title": "N8N_MCP_ALLOWED_PATHS",
+          "description": "File or directory path",
+          "examples": [
+            "/path/to/file",
+            "./config/file.json"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_RATE_LIMIT": {
+          "type": "integer",
+          "title": "N8N_MCP_RATE_LIMIT",
+          "description": "Rate limit or item limit",
+          "examples": [
+            100,
+            1000,
+            10000
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_RATE_WINDOW_MS": {
+          "type": "integer",
+          "title": "N8N_MCP_RATE_WINDOW_MS",
+          "description": "mcp rate window ms for n8n workflow automation platform",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_LOG_FILE": {
+          "type": "integer",
+          "title": "N8N_MCP_LOG_FILE",
+          "description": "File path",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_LOG_MAX_SIZE": {
+          "type": "integer",
+          "title": "N8N_MCP_LOG_MAX_SIZE",
+          "description": "mcp log max size for n8n workflow automation platform",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_LOG_MAX_FILES": {
+          "type": "integer",
+          "title": "N8N_MCP_LOG_MAX_FILES",
+          "description": "File path",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_MCP_LOG_FORMAT": {
+          "type": "integer",
+          "title": "N8N_MCP_LOG_FORMAT",
+          "description": "mcp log format for n8n workflow automation platform",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_SPEC_FILE": {
+          "type": "string",
+          "title": "OPENAPI_SPEC_FILE",
+          "description": "File path",
+          "pattern": "^[^\\0]+$",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "OPENAPI_SPEC_URL": {
+          "type": "string",
+          "title": "OPENAPI_SPEC_URL",
+          "description": "Service endpoint URL",
+          "format": "uri",
+          "examples": [
+            "https://api.example.com/openapi.json"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "OPENAPI_BASE_URL": {
+          "type": "string",
+          "title": "OPENAPI_BASE_URL",
+          "description": "Service endpoint URL",
+          "format": "uri",
+          "examples": [
+            "https://api.example.com"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-n8n-server.js",
+              "examples/mcp-openapi-server.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "examples/scripts/generate-openapi-mcp-tools.js",
+              "examples/scripts/spec-gate.js",
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js"
+            ],
+            "occurrences": 7
+          }
+        },
+        "OPENAPI_MCP_ALLOWED_METHODS": {
+          "type": "array",
+          "title": "OPENAPI_MCP_ALLOWED_METHODS",
+          "description": "Allowed items list",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js",
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js",
+              "tests/unit/zod-union-validation.test.js"
+            ],
+            "occurrences": 4
+          }
+        },
+        "OPENAPI_MCP_ALLOWED_PATHS": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_ALLOWED_PATHS",
+          "description": "File or directory path",
+          "examples": [
+            "/path/to/file",
+            "./config/file.json"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js",
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js",
+              "tests/unit/zod-union-validation.test.js"
+            ],
+            "occurrences": 4
+          }
+        },
+        "OPENAPI_MCP_RATE_LIMIT": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_RATE_LIMIT",
+          "description": "Rate limit or item limit",
+          "examples": [
+            100,
+            1000,
+            10000
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js",
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js"
+            ],
+            "occurrences": 3
+          }
+        },
+        "OPENAPI_MCP_RATE_WINDOW_MS": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_RATE_WINDOW_MS",
+          "description": "mcp rate window ms for Generic OpenAPI service integration",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js",
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js"
+            ],
+            "occurrences": 3
+          }
+        },
+        "OPENAPI_MCP_LOG_FILE": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_LOG_FILE",
+          "description": "File path",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_MCP_LOG_MAX_SIZE": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_LOG_MAX_SIZE",
+          "description": "mcp log max size for Generic OpenAPI service integration",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_MCP_LOG_MAX_FILES": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_LOG_MAX_FILES",
+          "description": "File path",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_MCP_LOG_FORMAT": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_LOG_FORMAT",
+          "description": "mcp log format for Generic OpenAPI service integration",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_API_KEY": {
+          "type": "string",
+          "title": "OPENAPI_API_KEY",
+          "description": "API key for service authentication (sensitive - do not log or expose)",
+          "examples": [
+            "your_openapi_api_key_here"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          },
+          "sensitive": true
+        },
+        "OPENAPI_BEARER_TOKEN": {
+          "type": "string",
+          "title": "OPENAPI_BEARER_TOKEN",
+          "description": "Bearer token for authorization (sensitive - do not log or expose)",
+          "examples": [
+            "your_openapi_bearer_token_here"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          },
+          "sensitive": true
+        },
+        "OPENAPI_BASIC_USER": {
+          "type": "string",
+          "title": "OPENAPI_BASIC_USER",
+          "description": "basic user for Generic OpenAPI service integration",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_BASIC_PASS": {
+          "type": "string",
+          "title": "OPENAPI_BASIC_PASS",
+          "description": "basic pass for Generic OpenAPI service integration (sensitive - do not log or expose)",
+          "examples": [
+            "your_openapi_basic_pass_here"
+          ],
+          "usage": {
+            "files": [
+              "examples/mcp-openapi-server.js"
+            ],
+            "occurrences": 1
+          },
+          "sensitive": true
+        },
+        "VAR_NAME": {
+          "type": "string",
+          "title": "VAR_NAME",
+          "description": "Configuration variable: name",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/scripts/generate-config-schemas.js",
+              "examples/scripts/generate-config-schemas.js",
+              "examples/scripts/generate-config-schemas.js",
+              "examples/scripts/generate-config-schemas.js",
+              "examples/scripts/generate-config-schemas.js",
+              "examples/scripts/generate-config-schemas.js"
+            ],
+            "occurrences": 6
+          }
+        },
+        "SPEC_GATE_OPT_PROB": {
+          "type": "integer",
+          "title": "SPEC_GATE_OPT_PROB",
+          "description": "Configuration variable: gate opt prob",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "examples/scripts/spec-gate.js",
+              "examples/scripts/spec-gate.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "ADOBE_ACCESS_TOKEN": {
+          "type": "string",
+          "title": "ADOBE_ACCESS_TOKEN",
+          "description": "Access token for API authentication (sensitive - do not log or expose)",
+          "examples": [
+            "your_adobe_access_token_here"
+          ],
+          "usage": {
+            "files": [
+              "examples/usage/adobe_pdf/automation-examples.md",
+              "examples/usage/adobe_pdf/automation-examples.md"
+            ],
+            "occurrences": 2
+          },
+          "sensitive": true
+        },
+        "N8N_URL": {
+          "type": "string",
+          "title": "N8N_URL",
+          "description": "Service endpoint URL",
+          "format": "uri",
+          "examples": [
+            "https://api.example.com",
+            "http://localhost:3000"
+          ],
+          "usage": {
+            "files": [
+              "tests/e2e.test.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "N8N_TOKEN": {
+          "type": "string",
+          "title": "N8N_TOKEN",
+          "description": "token for n8n workflow automation platform (sensitive - do not log or expose)",
+          "examples": [
+            "your_n8n_token_here"
+          ],
+          "usage": {
+            "files": [
+              "tests/e2e.test.js"
+            ],
+            "occurrences": 1
+          },
+          "sensitive": true
+        },
+        "UNIPILE_ACCOUNT_ID": {
+          "type": "string",
+          "title": "UNIPILE_ACCOUNT_ID",
+          "description": "Configuration variable: account id",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "tests/test-competitor-monitoring.js"
+            ],
+            "occurrences": 1
+          }
+        },
+        "OPENAPI_MCP_RATE_BURST": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_RATE_BURST",
+          "description": "mcp rate burst for Generic OpenAPI service integration",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "OPENAPI_MCP_CONCURRENCY": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_CONCURRENCY",
+          "description": "mcp concurrency for Generic OpenAPI service integration",
+          "examples": [
+            "example_value"
+          ],
+          "usage": {
+            "files": [
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "OPENAPI_MCP_CONCURRENCY_PER_PATH": {
+          "type": "integer",
+          "title": "OPENAPI_MCP_CONCURRENCY_PER_PATH",
+          "description": "File or directory path",
+          "examples": [
+            "/path/to/file",
+            "./config/file.json"
+          ],
+          "usage": {
+            "files": [
+              "tests/tmp/generated-hardening/tools.js",
+              "tests/tmp/generated-union/tools.js"
+            ],
+            "occurrences": 2
+          }
+        },
+        "HOST": {
+          "type": "string",
+          "title": "HOST",
+          "description": "Service hostname",
+          "examples": [
+            "localhost",
+            "api.example.com",
+            "127.0.0.1"
+          ],
+          "usage": {
+            "files": [
+              "tests/tmp/union-server.js"
+            ],
+            "occurrences": 1
+          }
+        }
+      }
+    },
+    "categories": {
+      "type": "object",
+      "description": "Environment variables grouped by category",
+      "properties": {
+        "configuration": {
+          "type": "object",
+          "title": "Configuration Variables",
+          "description": "Environment variables related to configuration",
+          "properties": {
+            "DEBUG_HTTP": {
+              "type": "boolean",
+              "title": "DEBUG_HTTP",
+              "description": "Enable debug mode",
+              "examples": [
+                "true",
+                "false",
+                "1",
+                "0"
+              ],
+              "usage": {
+                "files": [
+                  "lib/openapi-generator/index.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "tests/tmp/generated-hardening/http-client.js",
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/http-client.js",
+                  "tests/tmp/generated-union/tools.js",
+                  "tests/unit/zod-union-validation.test.js"
+                ],
+                "occurrences": 7
+              }
+            },
+            "DEBUG_DOCKER": {
+              "type": "boolean",
+              "title": "DEBUG_DOCKER",
+              "description": "Enable debug mode",
+              "examples": [
+                "1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_RATE_LIMIT": {
+              "type": "integer",
+              "title": "N8N_MCP_RATE_LIMIT",
+              "description": "Rate limit or item limit",
+              "examples": [
+                100,
+                1000,
+                10000
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_MCP_RATE_LIMIT": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_RATE_LIMIT",
+              "description": "Rate limit or item limit",
+              "examples": [
+                100,
+                1000,
+                10000
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js",
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js"
+                ],
+                "occurrences": 3
+              }
+            }
+          }
+        },
+        "authentication": {
+          "type": "object",
+          "title": "Authentication Variables",
+          "description": "Environment variables related to authentication",
+          "properties": {
+            "N8N_API_KEY": {
+              "type": "string",
+              "title": "N8N_API_KEY",
+              "description": "API key for service authentication (sensitive - do not log or expose)",
+              "examples": [
+                "your_n8n_api_key_here"
+              ],
+              "usage": {
+                "files": [
+                  "lib/openapi-generator/index.js",
+                  "lib/openapi-generator/index.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/multi-host-README.md",
+                  "examples/n8n-workflows-cli.js",
+                  "examples/n8n-workflows-cli.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "examples/scripts/test-oauth2.js",
+                  "examples/usage/n8n/automation-examples.md",
+                  "examples/usage/n8n/automation-examples.md",
+                  "tests/e2e.test.js",
+                  "tests/e2e.test.js",
+                  "tests/run-all.js"
+                ],
+                "occurrences": 15
+              },
+              "sensitive": true
+            },
+            "N8N_BEARER_TOKEN": {
+              "type": "string",
+              "title": "N8N_BEARER_TOKEN",
+              "description": "Bearer token for authorization (sensitive - do not log or expose)",
+              "examples": [
+                "your_n8n_bearer_token_here"
+              ],
+              "usage": {
+                "files": [
+                  "lib/openapi-generator/index.js",
+                  "lib/openapi-generator/index.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/n8n-workflows-cli.js",
+                  "examples/n8n-workflows-cli.js",
+                  "tests/e2e.test.js"
+                ],
+                "occurrences": 7
+              },
+              "sensitive": true
+            },
+            "OPENAPI_API_KEY": {
+              "type": "string",
+              "title": "OPENAPI_API_KEY",
+              "description": "API key for service authentication (sensitive - do not log or expose)",
+              "examples": [
+                "your_openapi_api_key_here"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              },
+              "sensitive": true
+            },
+            "OPENAPI_BEARER_TOKEN": {
+              "type": "string",
+              "title": "OPENAPI_BEARER_TOKEN",
+              "description": "Bearer token for authorization (sensitive - do not log or expose)",
+              "examples": [
+                "your_openapi_bearer_token_here"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              },
+              "sensitive": true
+            },
+            "ADOBE_ACCESS_TOKEN": {
+              "type": "string",
+              "title": "ADOBE_ACCESS_TOKEN",
+              "description": "Access token for API authentication (sensitive - do not log or expose)",
+              "examples": [
+                "your_adobe_access_token_here"
+              ],
+              "usage": {
+                "files": [
+                  "examples/usage/adobe_pdf/automation-examples.md",
+                  "examples/usage/adobe_pdf/automation-examples.md"
+                ],
+                "occurrences": 2
+              },
+              "sensitive": true
+            }
+          }
+        },
+        "n8n": {
+          "type": "object",
+          "title": "N8n Variables",
+          "description": "Environment variables related to n8n",
+          "properties": {
+            "N8N_BASIC_AUTH_USER": {
+              "type": "string",
+              "title": "N8N_BASIC_AUTH_USER",
+              "description": "basic auth user for n8n workflow automation platform (sensitive - do not log or expose)",
+              "examples": [
+                "your_n8n_basic_auth_user_here"
+              ],
+              "usage": {
+                "files": [
+                  "lib/openapi-generator/index.js",
+                  "lib/openapi-generator/index.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/n8n-workflows-cli.js",
+                  "examples/n8n-workflows-cli.js"
+                ],
+                "occurrences": 6
+              },
+              "sensitive": true
+            },
+            "N8N_BASIC_AUTH_PASS": {
+              "type": "string",
+              "title": "N8N_BASIC_AUTH_PASS",
+              "description": "basic auth pass for n8n workflow automation platform (sensitive - do not log or expose)",
+              "examples": [
+                "your_n8n_basic_auth_pass_here"
+              ],
+              "usage": {
+                "files": [
+                  "lib/openapi-generator/index.js",
+                  "lib/openapi-generator/index.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/n8n-workflows-cli.js",
+                  "examples/n8n-workflows-cli.js"
+                ],
+                "occurrences": 6
+              },
+              "sensitive": true
+            },
+            "N8N_MCP_DRY_RUN": {
+              "type": "array",
+              "title": "N8N_MCP_DRY_RUN",
+              "description": "mcp dry run for n8n workflow automation platform",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_RATE_WINDOW_MS": {
+              "type": "integer",
+              "title": "N8N_MCP_RATE_WINDOW_MS",
+              "description": "mcp rate window ms for n8n workflow automation platform",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_LOG_MAX_SIZE": {
+              "type": "integer",
+              "title": "N8N_MCP_LOG_MAX_SIZE",
+              "description": "mcp log max size for n8n workflow automation platform",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_LOG_FORMAT": {
+              "type": "integer",
+              "title": "N8N_MCP_LOG_FORMAT",
+              "description": "mcp log format for n8n workflow automation platform",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_TOKEN": {
+              "type": "string",
+              "title": "N8N_TOKEN",
+              "description": "token for n8n workflow automation platform (sensitive - do not log or expose)",
+              "examples": [
+                "your_n8n_token_here"
+              ],
+              "usage": {
+                "files": [
+                  "tests/e2e.test.js"
+                ],
+                "occurrences": 1
+              },
+              "sensitive": true
+            }
+          }
+        },
+        "docker": {
+          "type": "object",
+          "title": "Docker Variables",
+          "description": "Environment variables related to docker",
+          "properties": {
+            "DOCKER_SOCK": {
+              "type": "string",
+              "title": "DOCKER_SOCK",
+              "description": "sock for Docker container and image management",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js",
+                  "tests/e2e.docker-version.test.js"
+                ],
+                "occurrences": 2
+              }
+            },
+            "DOCKER_BIN": {
+              "type": "string",
+              "title": "DOCKER_BIN",
+              "description": "bin for Docker container and image management",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "DOCKER_COMPOSE_BIN": {
+              "type": "string",
+              "title": "DOCKER_COMPOSE_BIN",
+              "description": "compose bin for Docker container and image management",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "DOCKER_ALLOW_RUN": {
+              "type": "array",
+              "title": "DOCKER_ALLOW_RUN",
+              "description": "allow run for Docker container and image management",
+              "examples": [
+                "1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js"
+                ],
+                "occurrences": 1
+              }
+            }
+          }
+        },
+        "endpoints": {
+          "type": "object",
+          "title": "Endpoints Variables",
+          "description": "Environment variables related to endpoints",
+          "properties": {
+            "DOCKER_API_HOST": {
+              "type": "string",
+              "title": "DOCKER_API_HOST",
+              "description": "Service hostname",
+              "examples": [
+                "localhost",
+                "api.example.com",
+                "127.0.0.1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js",
+                  "tests/e2e.docker-version.test.js"
+                ],
+                "occurrences": 2
+              }
+            },
+            "HOSTINGER_SPEC_FILE": {
+              "type": "string",
+              "title": "HOSTINGER_SPEC_FILE",
+              "description": "Service hostname",
+              "examples": [
+                "localhost",
+                "api.example.com",
+                "127.0.0.1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOSTINGER_SPEC_URL": {
+              "type": "string",
+              "title": "HOSTINGER_SPEC_URL",
+              "description": "Service endpoint URL",
+              "examples": [
+                "https://api.example.com",
+                "http://localhost:3000"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOSTINGER_API_URL": {
+              "type": "string",
+              "title": "HOSTINGER_API_URL",
+              "description": "Service endpoint URL",
+              "format": "uri",
+              "examples": [
+                "https://api.example.com",
+                "http://localhost:3000"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOSTINGER_API_TOKEN": {
+              "type": "string",
+              "title": "HOSTINGER_API_TOKEN",
+              "description": "Service hostname (sensitive - do not log or expose)",
+              "examples": [
+                "your_hostinger_api_token_here"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js",
+                  "examples/multi-host-README.md",
+                  "examples/usage/hostinger/automation-examples.md",
+                  "examples/usage/hostinger/automation-examples.md",
+                  "tests/e2e.hostinger.test.js"
+                ],
+                "occurrences": 5
+              },
+              "sensitive": true
+            },
+            "HOSTINGER_USE_SDK": {
+              "type": "string",
+              "title": "HOSTINGER_USE_SDK",
+              "description": "Service hostname",
+              "examples": [
+                "localhost",
+                "api.example.com",
+                "127.0.0.1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOSTINGER_PROFILE": {
+              "type": "string",
+              "title": "HOSTINGER_PROFILE",
+              "description": "Service hostname",
+              "pattern": "^[^\\0]+$",
+              "examples": [
+                "curated"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOSTINGER_INCLUDE_RAW": {
+              "type": "array",
+              "title": "HOSTINGER_INCLUDE_RAW",
+              "description": "Service hostname",
+              "examples": [
+                "localhost",
+                "api.example.com",
+                "127.0.0.1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOSTINGER_ALLOW_RAW": {
+              "type": "array",
+              "title": "HOSTINGER_ALLOW_RAW",
+              "description": "Service hostname",
+              "examples": [
+                "localhost",
+                "api.example.com",
+                "127.0.0.1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-hostinger-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "PORT": {
+              "type": "integer",
+              "title": "PORT",
+              "description": "Service port number",
+              "examples": [
+                3000,
+                8080,
+                5432
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-multi-host.js",
+                  "tests/tmp/generated-hardening/index.js",
+                  "tests/tmp/generated-hardening/index.js",
+                  "tests/tmp/generated-hardening/index.js",
+                  "tests/tmp/generated-union/index.js",
+                  "tests/tmp/generated-union/index.js",
+                  "tests/tmp/generated-union/index.js",
+                  "tests/tmp/union-server.js"
+                ],
+                "occurrences": 8
+              }
+            },
+            "SSE_PORT": {
+              "type": "integer",
+              "title": "SSE_PORT",
+              "description": "Service port number",
+              "examples": [
+                3000,
+                8080,
+                5432
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-multi-host.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "WS_PORT": {
+              "type": "integer",
+              "title": "WS_PORT",
+              "description": "Service port number",
+              "examples": [
+                3000,
+                8080,
+                5432
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-multi-host.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_API_URL": {
+              "type": "string",
+              "title": "N8N_API_URL",
+              "description": "Service endpoint URL",
+              "format": "uri",
+              "examples": [
+                "https://your-n8n-instance.com/api/v1"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-n8n-server.js",
+                  "examples/n8n-workflows-cli.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "examples/scripts/generate-tool-schemas.js",
+                  "examples/scripts/spec-gate.js",
+                  "examples/usage/n8n/automation-examples.md",
+                  "examples/usage/n8n/automation-examples.md",
+                  "tests/e2e.test.js",
+                  "tests/e2e.test.js",
+                  "tests/run-all.js",
+                  "tests/run-all.js"
+                ],
+                "occurrences": 13
+              }
+            },
+            "OPENAPI_SPEC_URL": {
+              "type": "string",
+              "title": "OPENAPI_SPEC_URL",
+              "description": "Service endpoint URL",
+              "format": "uri",
+              "examples": [
+                "https://api.example.com/openapi.json"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 2
+              }
+            },
+            "OPENAPI_BASE_URL": {
+              "type": "string",
+              "title": "OPENAPI_BASE_URL",
+              "description": "Service endpoint URL",
+              "format": "uri",
+              "examples": [
+                "https://api.example.com"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-openapi-server.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "examples/scripts/generate-openapi-mcp-tools.js",
+                  "examples/scripts/spec-gate.js",
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js"
+                ],
+                "occurrences": 7
+              }
+            },
+            "N8N_URL": {
+              "type": "string",
+              "title": "N8N_URL",
+              "description": "Service endpoint URL",
+              "format": "uri",
+              "examples": [
+                "https://api.example.com",
+                "http://localhost:3000"
+              ],
+              "usage": {
+                "files": [
+                  "tests/e2e.test.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "HOST": {
+              "type": "string",
+              "title": "HOST",
+              "description": "Service hostname",
+              "examples": [
+                "localhost",
+                "api.example.com",
+                "127.0.0.1"
+              ],
+              "usage": {
+                "files": [
+                  "tests/tmp/union-server.js"
+                ],
+                "occurrences": 1
+              }
+            }
+          }
+        },
+        "security": {
+          "type": "object",
+          "title": "Security Variables",
+          "description": "Environment variables related to security",
+          "properties": {
+            "DOCKER_ALLOWED_IMAGES": {
+              "type": "array",
+              "title": "DOCKER_ALLOWED_IMAGES",
+              "description": "Allowed items list",
+              "examples": [
+                "nginx,redis,postgres"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-docker-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_ALLOWED_METHODS": {
+              "type": "array",
+              "title": "N8N_MCP_ALLOWED_METHODS",
+              "description": "Allowed items list",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_MCP_ALLOWED_METHODS": {
+              "type": "array",
+              "title": "OPENAPI_MCP_ALLOWED_METHODS",
+              "description": "Allowed items list",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js",
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js",
+                  "tests/unit/zod-union-validation.test.js"
+                ],
+                "occurrences": 4
+              }
+            }
+          }
+        },
+        "files": {
+          "type": "object",
+          "title": "Files Variables",
+          "description": "Environment variables related to files",
+          "properties": {
+            "N8N_MCP_ALLOWED_PATHS": {
+              "type": "integer",
+              "title": "N8N_MCP_ALLOWED_PATHS",
+              "description": "File or directory path",
+              "examples": [
+                "/path/to/file",
+                "./config/file.json"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_LOG_FILE": {
+              "type": "integer",
+              "title": "N8N_MCP_LOG_FILE",
+              "description": "File path",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "N8N_MCP_LOG_MAX_FILES": {
+              "type": "integer",
+              "title": "N8N_MCP_LOG_MAX_FILES",
+              "description": "File path",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_SPEC_FILE": {
+              "type": "string",
+              "title": "OPENAPI_SPEC_FILE",
+              "description": "File path",
+              "pattern": "^[^\\0]+$",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-n8n-server.js",
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 2
+              }
+            },
+            "OPENAPI_MCP_ALLOWED_PATHS": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_ALLOWED_PATHS",
+              "description": "File or directory path",
+              "examples": [
+                "/path/to/file",
+                "./config/file.json"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js",
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js",
+                  "tests/unit/zod-union-validation.test.js"
+                ],
+                "occurrences": 4
+              }
+            },
+            "OPENAPI_MCP_LOG_FILE": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_LOG_FILE",
+              "description": "File path",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_MCP_LOG_MAX_FILES": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_LOG_MAX_FILES",
+              "description": "File path",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_MCP_CONCURRENCY_PER_PATH": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_CONCURRENCY_PER_PATH",
+              "description": "File or directory path",
+              "examples": [
+                "/path/to/file",
+                "./config/file.json"
+              ],
+              "usage": {
+                "files": [
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js"
+                ],
+                "occurrences": 2
+              }
+            }
+          }
+        },
+        "openapi": {
+          "type": "object",
+          "title": "Openapi Variables",
+          "description": "Environment variables related to openapi",
+          "properties": {
+            "OPENAPI_MCP_RATE_WINDOW_MS": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_RATE_WINDOW_MS",
+              "description": "mcp rate window ms for Generic OpenAPI service integration",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js",
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js"
+                ],
+                "occurrences": 3
+              }
+            },
+            "OPENAPI_MCP_LOG_MAX_SIZE": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_LOG_MAX_SIZE",
+              "description": "mcp log max size for Generic OpenAPI service integration",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_MCP_LOG_FORMAT": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_LOG_FORMAT",
+              "description": "mcp log format for Generic OpenAPI service integration",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_BASIC_USER": {
+              "type": "string",
+              "title": "OPENAPI_BASIC_USER",
+              "description": "basic user for Generic OpenAPI service integration",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              }
+            },
+            "OPENAPI_BASIC_PASS": {
+              "type": "string",
+              "title": "OPENAPI_BASIC_PASS",
+              "description": "basic pass for Generic OpenAPI service integration (sensitive - do not log or expose)",
+              "examples": [
+                "your_openapi_basic_pass_here"
+              ],
+              "usage": {
+                "files": [
+                  "examples/mcp-openapi-server.js"
+                ],
+                "occurrences": 1
+              },
+              "sensitive": true
+            },
+            "OPENAPI_MCP_RATE_BURST": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_RATE_BURST",
+              "description": "mcp rate burst for Generic OpenAPI service integration",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js"
+                ],
+                "occurrences": 2
+              }
+            },
+            "OPENAPI_MCP_CONCURRENCY": {
+              "type": "integer",
+              "title": "OPENAPI_MCP_CONCURRENCY",
+              "description": "mcp concurrency for Generic OpenAPI service integration",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "tests/tmp/generated-hardening/tools.js",
+                  "tests/tmp/generated-union/tools.js"
+                ],
+                "occurrences": 2
+              }
+            }
+          }
+        },
+        "general": {
+          "type": "object",
+          "title": "General Variables",
+          "description": "Environment variables related to general",
+          "properties": {
+            "VAR_NAME": {
+              "type": "string",
+              "title": "VAR_NAME",
+              "description": "Configuration variable: name",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/scripts/generate-config-schemas.js",
+                  "examples/scripts/generate-config-schemas.js",
+                  "examples/scripts/generate-config-schemas.js",
+                  "examples/scripts/generate-config-schemas.js",
+                  "examples/scripts/generate-config-schemas.js",
+                  "examples/scripts/generate-config-schemas.js"
+                ],
+                "occurrences": 6
+              }
+            },
+            "SPEC_GATE_OPT_PROB": {
+              "type": "integer",
+              "title": "SPEC_GATE_OPT_PROB",
+              "description": "Configuration variable: gate opt prob",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "examples/scripts/spec-gate.js",
+                  "examples/scripts/spec-gate.js"
+                ],
+                "occurrences": 2
+              }
+            },
+            "UNIPILE_ACCOUNT_ID": {
+              "type": "string",
+              "title": "UNIPILE_ACCOUNT_ID",
+              "description": "Configuration variable: account id",
+              "examples": [
+                "example_value"
+              ],
+              "usage": {
+                "files": [
+                  "tests/test-competitor-monitoring.js"
+                ],
+                "occurrences": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
