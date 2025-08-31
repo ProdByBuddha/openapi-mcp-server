@@ -2,7 +2,6 @@ const { makeHttpRequest } = require('./http-client.js');
 const { z } = require('zod');
 const { randomUUID } = require('crypto');
 
-// Hardening controls for outgoing HTTP
 const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
 const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0); // token bucket burst
 const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
