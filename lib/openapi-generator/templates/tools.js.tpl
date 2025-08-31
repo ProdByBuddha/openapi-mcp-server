@@ -2,16 +2,6 @@ const { makeHttpRequest } = require('./http-client.js');
 const { z } = require('zod');
 const { randomUUID } = require('crypto');
 
-// Hardening controls for outgoing HTTP
-const ALLOWED_METHODS = new Set(
-  String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE')
-    .split(',')
-    .map(s => s.trim().toUpperCase())
-    .filter(Boolean)
-);
-
-const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').map(p => p.trim()).filter(Boolean);
-const ALLOWED_METHODS_LIST = (process.env.OPENAPI_MCP_ALLOWED_METHODS || '').split(',').filter(m => m.trim());
 const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
 const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0); // token bucket burst
 const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
@@ -349,4 +339,4 @@ const tools = [
 module.exports = {
   tools,
   genericHandler, // export if you need to call it directly elsewhere
-};};
+};
