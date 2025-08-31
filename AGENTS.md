@@ -90,7 +90,7 @@ The project follows a modular architecture with clear separation between core lo
 - **`lib/openapi-generator/`**: Core tool generation engine (ES modules)
   - `index.js`: Main generator functions and HTTP utilities with ES module imports
   - `server-generator.js`: Full MCP server scaffolding generator (complete ES modules conversion with `__filename`/`__dirname` polyfills)
-  - `templates/`: JavaScript server templates (.js, package.json, README, etc.)
+  - `templates/`: JavaScript server templates with robust syntax validation and error handling
   - `templates-ts/`: TypeScript server templates (.ts, tsconfig.json, etc.)
 
 - **`examples/`**: Executable MCP servers and CLI utilities (ES modules)
@@ -386,13 +386,13 @@ For detailed contribution guidelines, see `CONTRIBUTING.md`.
 - **Auto-Discovery System**: Extract OpenAPI specs from documentation pages automatically
 - **Comprehensive Service Ecosystem**: 16+ pre-configured popular services in `services.dynamic.json`
 - **Adobe PDF Services Integration**: Full support for PDF processing operations (combine, OCR, protect, extract, document generation)
-- **Configuration Template System**: Automated generation of configuration templates with validation scripts and migration guides
+- **Configuration Template System**: Comprehensive automated generation of configuration templates with validation scripts, migration guides, and schema generation from codebase analysis
 - **Enhanced Documentation**: Improved formatting and consistency across configuration files
 - **Robust Path Parameter Handling**: Automatic extraction of path parameters from URL templates with fallback mechanisms for incomplete OpenAPI specs
 
 ### Developer Experience Improvements
 - **ES Modules Migration**: Complete conversion from CommonJS to ES modules including all core generator components (server-generator.js with proper `__filename`/`__dirname` polyfills) and main example scripts with proper module import handling for modern Node.js compatibility and better performance
-- **Enhanced Template Processing**: Improved template rendering system with proper character escaping to prevent conflicts during server generation
+- **Enhanced Template Processing**: Robust template rendering system with comprehensive syntax validation, proper character escaping, and error handling to ensure reliable server generation
 - **Enhanced File Processing**: Improved YAML/JSON parsing with correct ES module imports ensuring reliable specification file processing
 - **Configuration Management System**: Complete configuration template generator with validation scripts, migration guides, and automated schema generation
 - **Dynamic Port Allocation**: Automatic port discovery for HTTP transports to avoid conflicts
@@ -400,16 +400,17 @@ For detailed contribution guidelines, see `CONTRIBUTING.md`.
 - **GitHub Wiki Integration**: Auto-generated documentation with CI/CD pipeline
 - **Enhanced CLI Tools**: One-shot execution mode, service configuration management, template generation with validation
 - **Improved Error Handling**: Better error messages, fallback mechanisms, and graceful service loading with auth validation
-- **Security Hardening**: Enhanced rate limiting, audit logging, and access controls with per-service authentication validation
+- **Security Hardening**: Advanced security controls with token bucket rate limiting, comprehensive audit logging, method/path allowlists, concurrency controls, and per-service authentication validation
 - **OpenAPI Spec Compatibility**: Enhanced parsing with automatic path parameter detection for better compatibility with various OpenAPI specification formats
 
 ### Architecture Evolution
 - **Modern ES Modules**: Complete conversion to ES modules including all core generator components (index.js, server-generator.js with proper `__filename`/`__dirname` polyfills) and main example scripts with proper module import handling for better tree-shaking, static analysis, and future compatibility
-- **Enhanced Template Processing**: Improved template rendering with proper escaping of special characters to prevent conflicts during code generation
+- **Robust Template System**: Enhanced template processing with comprehensive syntax validation, proper character escaping, and error handling to ensure reliable code generation
+- **Advanced Security Controls**: Multi-layered security with rate limiting using token bucket algorithm, method/path allowlists, concurrency controls, and comprehensive audit logging
 - **Robust File Processing**: Enhanced YAML/JSON parsing with proper ES module imports ensuring reliable spec file processing
 - **Primary Entry Point**: `examples/mcp-multi-host.js` as the main server
 - **Modular Design**: Clear separation between core generator and service implementations
-- **Extensible Plugin System**: Easy addition of new service integrations
-- **Production Ready**: Comprehensive testing, CI/CD, and monitoring capabilities
+- **Extensible Plugin System**: Easy addition of new service integrations with comprehensive configuration management
+- **Production Ready**: Comprehensive testing, CI/CD, monitoring capabilities, and automated configuration template generation
 
-The project has evolved from a simple n8n integration to a comprehensive OpenAPI-to-MCP bridge supporting enterprise-grade deployments with multiple services, security controls, and extensive customization options. Version 1.7.0 represents a mature, production-ready platform with comprehensive configuration management, automated template generation, and robust service ecosystem supporting 16+ popular APIs out of the box.
+The project has evolved from a simple n8n integration to a comprehensive OpenAPI-to-MCP bridge supporting enterprise-grade deployments with multiple services, advanced security controls, and extensive customization options. Version 1.7.0 represents a mature, production-ready platform with comprehensive configuration management, automated template generation with robust validation, and a stable service ecosystem supporting 16+ popular APIs out of the box.
