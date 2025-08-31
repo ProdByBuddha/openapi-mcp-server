@@ -10,7 +10,7 @@ const ALLOWED_METHODS = new Set(
     .filter(Boolean)
 );
 
-const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').filter(p => p.trim());
+const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').map(p => p.trim()).filter(Boolean);
 const ALLOWED_METHODS_LIST = (process.env.OPENAPI_MCP_ALLOWED_METHODS || '').split(',').filter(m => m.trim());
 
 const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
