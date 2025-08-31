@@ -79,9 +79,9 @@
   "license": "MIT",
   "dependencies": {
     "@dotenvx/dotenvx": "^1.49.0",
-    "body-parser": "^2.2.0",
+    "body-parser": "^1.20.2",
     "dotenv": "^16.4.5",
-    "express": "^5.1.0",
+    "express": "^4.19.2",
     "soap": "^0.45.0",
     "swagger-parser": "^10.0.3",
     "swagger-spec-validator": "^5.0.0",
