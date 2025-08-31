@@ -12,7 +12,6 @@ const ALLOWED_METHODS = new Set(
 
 const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').map(p => p.trim()).filter(Boolean);
 const ALLOWED_METHODS_LIST = (process.env.OPENAPI_MCP_ALLOWED_METHODS || '').split(',').filter(m => m.trim());
-
 const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
 const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0); // token bucket burst
 const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
@@ -34,9 +33,6 @@ function wildcardToRegExp(pattern) {
   return new RegExp('^' + esc + '$');
 }
 
-// COMPILED REGEXES (was missing before)
-const ALLOWED_PATH_REGEXES = ALLOWED_PATH_PATTERNS.map(wildcardToRegExp);
-
 function checkRateLimit() {
   const now = Date.now();
   if (now - rateWindowStart >= RATE_WINDOW_MS) {
@@ -57,6 +53,15 @@ function checkRateLimit() {
 }
 
 function enforcePolicy(method, path) {
+  const ALLOWED_METHODS = new Set(
+    String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE')
+      .split(',')
+      .map(s => s.trim().toUpperCase())
+      .filter(Boolean)
+  );
+  const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').map(p => p.trim()).filter(Boolean);
+  const ALLOWED_PATH_REGEXES = ALLOWED_PATH_PATTERNS.map(wildcardToRegExp);
+
   const m = String(method || '').toUpperCase();
   if (!ALLOWED_METHODS.has(m)) throw new Error(`Method not allowed: ${m}`);
   const p = String(path || '');
