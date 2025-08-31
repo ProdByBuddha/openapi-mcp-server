@@ -1,7 +1,14 @@
 {
   "openapi": "3.0.0",
-  "info": { "title": "Union Validation API", "version": "1.0.0" },
-  "servers": [ { "url": "http://localhost:4556" } ],
+  "info": {
+    "title": "Union Validation API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4556"
+    }
+  ],
   "paths": {
     "/union-any": {
       "post": {
@@ -13,14 +20,38 @@
             "application/json": {
               "schema": {
                 "anyOf": [
-                  { "type": "object", "properties": { "a": { "type": "string" } }, "required": ["a"] },
-                  { "type": "object", "properties": { "b": { "type": "number" } }, "required": ["b"] }
+                  {
+                    "type": "object",
+                    "properties": {
+                      "a": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "a"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "b": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "b"
+                    ]
+                  }
                 ]
               }
             }
           }
         },
-        "responses": { "200": { "description": "ok" } }
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
       }
     },
     "/union-one": {
@@ -33,17 +64,40 @@
             "application/json": {
               "schema": {
                 "oneOf": [
-                  { "type": "object", "properties": { "x": { "type": "boolean" } }, "required": ["x"] },
-                  { "type": "object", "properties": { "y": { "type": "integer" } }, "required": ["y"] }
+                  {
+                    "type": "object",
+                    "properties": {
+                      "x": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "x"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "y": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "y"
+                    ]
+                  }
                 ]
               }
             }
           }
         },
-        "responses": { "200": { "description": "ok" } }
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
       }
-    }
-    ,
+    },
     "/union-nested": {
       "post": {
         "operationId": "testUnionNested",
@@ -57,21 +111,42 @@
                   {
                     "type": "object",
                     "properties": {
-                      "inner": { "oneOf": [ { "type": "string" }, { "type": "number" } ] }
+                      "inner": {
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      }
                     },
-                    "required": ["inner"]
+                    "required": [
+                      "inner"
+                    ]
                   },
                   {
                     "type": "object",
-                    "properties": { "flag": { "type": "boolean" } },
-                    "required": ["flag"]
+                    "properties": {
+                      "flag": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "flag"
+                    ]
                   }
                 ]
               }
             }
           }
         },
-        "responses": { "200": { "description": "ok" } }
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
       }
     },
     "/union-array": {
@@ -84,12 +159,25 @@
             "application/json": {
               "schema": {
                 "type": "array",
-                "items": { "oneOf": [ { "type": "string" }, { "type": "number" } ] }
+                "items": {
+                  "oneOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "number"
+                    }
+                  ]
+                }
               }
             }
           }
         },
-        "responses": { "200": { "description": "ok" } }
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
       }
     }
   }
