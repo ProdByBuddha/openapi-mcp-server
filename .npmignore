@@ -49,3 +49,4 @@ analysis/*
 .vscode
 
 *.patch
+tests/tmp/
