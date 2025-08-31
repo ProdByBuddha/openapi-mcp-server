@@ -2,8 +2,6 @@ const { makeHttpRequest } = require('./http-client.js');
 const { z } = require('zod');
 const { randomUUID } = require('crypto');
 
-// Hardening controls for outgoing HTTP
-
 const inflight = new Set(); // holds unique UUIDs
 const inflightPerPath = new Map();
 
