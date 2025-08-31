@@ -1,41 +1,3 @@
-const { makeHttpRequest } = require('./http-client.js');
-const { z } = require('zod');
-const { randomUUID } = require('crypto');
-
-// Hardening controls for outgoing HTTP
-const ALLOWED_METHODS = new Set(
-  String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE')
-    .split(',')
-    .map(s => s.trim().toUpperCase())
-    .filter(Boolean)
-);
-
-const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').filter(p => p.trim());
-const ALLOWED_METHODS_LIST = (process.env.OPENAPI_MCP_ALLOWED_METHODS || '').split(',').filter(m => m.trim());
-
-const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
-const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0); // token bucket burst
-const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
-const GLOBAL_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY || 0); // 0 = unlimited
-const PER_PATH_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY_PER_PATH || 0);
-
-let rateWindowStart = Date.now();
-let rateCount = 0;
-let tokens = RATE_BURST;
-let lastRefill = Date.now();
-
-const inflight = new Set(); // holds unique UUIDs
-const inflightPerPath = new Map();
-
-function wildcardToRegExp(pattern) {
-  const esc = pattern.replace(/[.+^${}()|[\]\\]/g, function(match) {
-    return '\\' + match;
-  }).replace(/\*/g, '.*');
-  return new RegExp('^' + esc + '$');
-}
-
-// COMPILED REGEXES (was missing before)
-const ALLOWED_PATH_REGEXES = ALLOWED_PATH_PATTERNS.map(wildcardToRegExp);
 
 function checkRateLimit() {
   const now = Date.now();
@@ -74,16 +36,16 @@ function acquireConcurrency(path) {
     if (n >= PER_PATH_CONCURRENCY) throw new Error('Per-path concurrency limit exceeded');
     inflightPerPath.set(path, n + 1);
   }
-  const id = randomUUID();   // ✅ stable UUID instead of Symbol
-  inflight.add(id);
-  return id;
+  const marker = Symbol(); // unique per request (fix: Symbol.for caused set to contain one element)
+  inflight.add(marker);
+  return marker;
 }
 
-function releaseConcurrency(path, id) {
-  if (id && inflight.has(id)) {
-    inflight.delete(id);
+function releaseConcurrency(path, marker) {
+  if (marker && inflight.has(marker)) {
+    inflight.delete(marker);
   } else {
-    // Fallback cleanup
+    // Fallback: remove any one marker if something went off the rails
     for (const k of inflight) {
       inflight.delete(k);
       break;
@@ -344,4 +306,4 @@ const tools = [
 module.exports = {
   tools,
   genericHandler, // export if you need to call it directly elsewhere
-};};
+};

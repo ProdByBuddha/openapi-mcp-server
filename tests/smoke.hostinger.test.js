@@ -2,8 +2,12 @@ import assert from 'assert';
 import path from 'path';
 import fs from 'fs';
 import { spawnSync } from 'child_process';
+import { fileURLToPath } from 'url';
 
 import * as gen from '../lib/openapi-generator/index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 (async () => {
   try {

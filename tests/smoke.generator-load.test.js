@@ -52,7 +52,7 @@ function readJson(filePath) {
   const specPath = path.join(tmpDir, 'simple-openapi.json');
   writeJson(specPath, spec);
   const outPath = path.join(tmpDir, 'offline-tools.json');
-  const genRes = spawnSync(process.execPath, [path.resolve(__dirname, '..', 'examples', 'generate-openapi-mcp-tools.js'), '--from-file', specPath, '--out', outPath], { stdio: 'inherit', env: process.env });
+  const genRes = spawnSync(process.execPath, [path.resolve(__dirname, '..', 'examples', 'scripts', 'generate-openapi-mcp-tools.js'), '--from-file', specPath, '--out', outPath], { stdio: 'inherit', env: process.env });
   assert.strictEqual(genRes.status, 0, 'generator CLI should exit 0');
   const offline = readJson(outPath);
   assert(offline && Array.isArray(offline.tools) && offline.tools.length > 0, 'offline tools JSON present');

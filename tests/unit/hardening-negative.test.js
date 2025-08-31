@@ -28,7 +28,7 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
     const toolsPath = path.join(outDir, 'tools.js');
 
     // Helper to load tools with fresh policy env
-    const loadToolsWithEnv = (env) => {
+    const loadToolsWithEnv = async (env) => {
       for (const k of ['OPENAPI_MCP_ALLOWED_PATHS','OPENAPI_MCP_ALLOWED_METHODS','OPENAPI_MCP_RATE_LIMIT','OPENAPI_MCP_RATE_WINDOW_MS']) {
         if (env[k] !== undefined) process.env[k] = env[k]; else delete process.env[k];
       }
@@ -39,7 +39,7 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
     };
 
     // 1) Path allowlist blocks call
-    let tools = loadToolsWithEnv({ OPENAPI_MCP_ALLOWED_PATHS: '/not-allowed*', OPENAPI_MCP_ALLOWED_METHODS: 'GET,POST' });
+    let tools = await loadToolsWithEnv({ OPENAPI_MCP_ALLOWED_PATHS: '/not-allowed*', OPENAPI_MCP_ALLOWED_METHODS: 'GET,POST' });
     let threw = false;
     try {
       await tools['testUnionAny'].handler({ body: { a: 'ok' } });
@@ -47,15 +47,23 @@ function wait(ms) { return new Promise((r) => setTimeout(r, ms)); }
     assert(threw, 'Expected Path not allowed to be thrown');
 
     // 2) Method allowlist blocks POST
-    tools = loadToolsWithEnv({ OPENAPI_MCP_ALLOWED_PATHS: '/union-*', OPENAPI_MCP_ALLOWED_METHODS: 'GET' });
+    tools = await loadToolsWithEnv({ OPENAPI_MCP_ALLOWED_PATHS: '/union-*', OPENAPI_MCP_ALLOWED_METHODS: 'GET' });
     threw = false;
+    let errorMsg = '';
     try {
       await tools['testUnionAny'].handler({ body: { a: 'ok' } });
-    } catch (e) { threw = /Method not allowed/i.test(String(e.message||'')); }
+    } catch (e) { 
+      errorMsg = String(e.message || '');
+      threw = /Method not allowed/i.test(errorMsg); 
+    }
+    if (!threw) {
+      console.log('DEBUG: Expected Method not allowed error, but got:', errorMsg);
+      console.log('DEBUG: OPENAPI_MCP_ALLOWED_METHODS =', process.env.OPENAPI_MCP_ALLOWED_METHODS);
+    }
     assert(threw, 'Expected Method not allowed to be thrown');
 
     // 3) Rate limit exceeded on second call
-    tools = loadToolsWithEnv({ OPENAPI_MCP_ALLOWED_PATHS: '/union-*', OPENAPI_MCP_ALLOWED_METHODS: 'GET,POST', OPENAPI_MCP_RATE_LIMIT: '1', OPENAPI_MCP_RATE_WINDOW_MS: '60000' });
+    tools = await loadToolsWithEnv({ OPENAPI_MCP_ALLOWED_PATHS: '/union-*', OPENAPI_MCP_ALLOWED_METHODS: 'GET,POST', OPENAPI_MCP_RATE_LIMIT: '1', OPENAPI_MCP_RATE_WINDOW_MS: '60000' });
     const ok1 = await tools['testUnionAny'].handler({ body: { a: 'ok' } });
     assert(ok1 && ok1.ok === true, 'First call should succeed');
     threw = false;

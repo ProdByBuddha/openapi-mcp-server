@@ -97,7 +97,7 @@ The server can also load OpenAPI specs dynamically on startup via env vars
         "specUrl": "${ACME_SPEC_URL}",
         "baseUrl": "${ACME_BASE_URL}",
         "auth": { "kind": "bearer", "env": "ACME_TOKEN" }
-      }
+      } 
     ]
   }
   ```

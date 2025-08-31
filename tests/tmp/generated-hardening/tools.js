@@ -1,30 +1,50 @@
 const { makeHttpRequest } = require('./http-client.js');
 const { z } = require('zod');
+const { randomUUID } = require('crypto');
 
 // Hardening controls for outgoing HTTP
-const ALLOWED_METHODS = new Set(String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE').split(',').map(s => s.trim().toUpperCase()).filter(Boolean));
-const ALLOWED_PATH_PATTERNS = String(process.env.OPENAPI_MCP_ALLOWED_PATHS || '.*').split(',').map(s => s.trim()).filter(Boolean);
+const ALLOWED_METHODS = new Set(
+  String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE')
+    .split(',')
+    .map(s => s.trim().toUpperCase())
+    .filter(Boolean)
+);
+
+const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').filter(p => p.trim());
+const ALLOWED_METHODS_LIST = (process.env.OPENAPI_MCP_ALLOWED_METHODS || '').split(',').filter(m => m.trim());
+
 const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
 const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0); // token bucket burst
 const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
 const GLOBAL_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY || 0); // 0 = unlimited
 const PER_PATH_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY_PER_PATH || 0);
+
 let rateWindowStart = Date.now();
 let rateCount = 0;
-let tokens = RATE_BURST; let lastRefill = Date.now();
-const inflight = new Set();
+let tokens = RATE_BURST;
+let lastRefill = Date.now();
+
+const inflight = new Set(); // holds unique UUIDs
 const inflightPerPath = new Map();
 
 function wildcardToRegExp(pattern) {
-  const esc = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*');
+  const esc = pattern.replace(/[.+^${}()|[\]\\]/g, function(match) {
+    return '\\' + match;
+  }).replace(/\*/g, '.*');
   return new RegExp('^' + esc + '$');
 }
+
+// COMPILED REGEXES (was missing before)
 const ALLOWED_PATH_REGEXES = ALLOWED_PATH_PATTERNS.map(wildcardToRegExp);
 
 function checkRateLimit() {
   const now = Date.now();
-  if (now - rateWindowStart >= RATE_WINDOW_MS) { rateWindowStart = now; rateCount = 0; }
+  if (now - rateWindowStart >= RATE_WINDOW_MS) {
+    rateWindowStart = now;
+    rateCount = 0;
+  }
   rateCount += 1;
+
   if (RATE_LIMIT > 0) {
     // token bucket refill
     const elapsed = Math.max(0, now - lastRefill);
@@ -40,23 +60,35 @@ function enforcePolicy(method, path) {
   const m = String(method || '').toUpperCase();
   if (!ALLOWED_METHODS.has(m)) throw new Error(`Method not allowed: ${m}`);
   const p = String(path || '');
-  const ok = ALLOWED_PATH_REGEXES.length === 0 || ALLOWED_PATH_REGEXES.some((re) => re.test(p));
+  const ok = ALLOWED_PATH_REGEXES.length === 0 || ALLOWED_PATH_REGEXES.some(re => re.test(p));
   if (!ok) throw new Error(`Path not allowed: ${p}`);
 }
 
+// Return a unique marker so we can release the exact one we acquired
 function acquireConcurrency(path) {
-  if (GLOBAL_CONCURRENCY > 0 && inflight.size >= GLOBAL_CONCURRENCY) throw new Error('Concurrency limit exceeded');
+  if (GLOBAL_CONCURRENCY > 0 && inflight.size >= GLOBAL_CONCURRENCY) {
+    throw new Error('Concurrency limit exceeded');
+  }
   if (PER_PATH_CONCURRENCY > 0) {
     const n = inflightPerPath.get(path) || 0;
     if (n >= PER_PATH_CONCURRENCY) throw new Error('Per-path concurrency limit exceeded');
     inflightPerPath.set(path, n + 1);
   }
-  inflight.add(Symbol.for('req'));
+  const id = randomUUID();   // ✅ stable UUID instead of Symbol
+  inflight.add(id);
+  return id;
 }
 
-function releaseConcurrency(path) {
-  // remove one marker
-  for (const k of inflight) { inflight.delete(k); break; }
+function releaseConcurrency(path, id) {
+  if (id && inflight.has(id)) {
+    inflight.delete(id);
+  } else {
+    // Fallback cleanup
+    for (const k of inflight) {
+      inflight.delete(k);
+      break;
+    }
+  }
   if (PER_PATH_CONCURRENCY > 0) {
     const n = inflightPerPath.get(path) || 1;
     inflightPerPath.set(path, Math.max(0, n - 1));
@@ -113,21 +145,21 @@ function jsonSchemaToZod(schema) {
   if (schema.description) {
     zodSchema = zodSchema.describe(schema.description);
   }
-  if (schema.minLength) {
+  if (schema.minLength != null) {
     zodSchema = zodSchema.min(schema.minLength);
   }
-  if (schema.maxLength) {
+  if (schema.maxLength != null) {
     zodSchema = zodSchema.max(schema.maxLength);
   }
-  if (schema.minimum) {
+  if (schema.minimum != null) {
     zodSchema = zodSchema.gte(schema.minimum);
   }
-  if (schema.maximum) {
+  if (schema.maximum != null) {
     zodSchema = zodSchema.lte(schema.maximum);
   }
   if (schema.enum) {
-    if (schema.enum.every((v) => typeof v === 'string')) zodSchema = z.enum(schema.enum);
-    else zodSchema = z.union(schema.enum.map((v) => z.literal(v)));
+    if (schema.enum.every(v => typeof v === 'string')) zodSchema = z.enum(schema.enum);
+    else zodSchema = z.union(schema.enum.map(v => z.literal(v)));
   }
 
   return zodSchema;
@@ -140,11 +172,11 @@ async function genericHandler(serializationInfo, args) {
   const {
     path,
     method,
-    pathParams,
-    queryParams,
-    headerParams,
-    cookieParams,
-    security,
+    pathParams = [],
+    queryParams = [],
+    headerParams = [],
+    cookieParams = [],
+    security = [],
     inputSchema
   } = serializationInfo;
 
@@ -165,8 +197,9 @@ async function genericHandler(serializationInfo, args) {
   let requestBody;
 
   const securityHandlers = {
-    'apiKey': (sec, headers, query, args) => {
+    apiKey: (sec, headers, query, args) => {
       const key = sec.paramName || sec.name; // prefer actual header/query name
+      if (!key) return;
       if (sec.in === 'header') {
         headers[key] = args[key];
       } else if (sec.in === 'query') {
@@ -175,7 +208,7 @@ async function genericHandler(serializationInfo, args) {
         headers['Cookie'] = `${key}=${encodeURIComponent(String(args[key] || ''))}`;
       }
     },
-    'http': (sec, headers, query, args) => {
+    http: (sec, headers, _query, args) => {
       if (sec.scheme === 'bearer') {
         headers['Authorization'] = `Bearer ${args.bearerToken}`;
       } else if (sec.scheme === 'basic') {
@@ -183,25 +216,33 @@ async function genericHandler(serializationInfo, args) {
         headers['Authorization'] = `Basic ${token}`;
       }
     },
-    'oauth2': async (sec, headers, query, args) => {
+    oauth2: async (sec, headers, _query, args) => {
       if (sec.flows && sec.flows.clientCredentials) {
         const tokenUrl = sec.flows.clientCredentials.tokenUrl;
-        const scopes = Array.isArray(sec.flows.clientCredentials.scopes) ? sec.flows.clientCredentials.scopes.join(' ') : '';
+        const scopes = Array.isArray(sec.flows.clientCredentials.scopes)
+          ? sec.flows.clientCredentials.scopes.join(' ')
+          : '';
         const cacheKey = `${tokenUrl}|${args.clientId || ''}|${scopes}`;
         const now = Date.now();
         const cached = __oauth2Cache.get(cacheKey);
-        if (cached && cached.exp > now + 5000) { // 5s slack
+        if (cached && cached.exp > now + 5000) {
           headers['Authorization'] = `Bearer ${cached.token}`;
           return;
         }
         const DEBUG_HTTP = /^(1|true|yes)$/i.test(String(process.env.DEBUG_HTTP || ''));
-        const body = `grant_type=client_credentials&client_id=${encodeURIComponent(args.clientId||'')}&client_secret=${encodeURIComponent(args.clientSecret||'')}${scopes ? `&scope=${encodeURIComponent(scopes)}` : ''}`;
-        const attempt = async () => makeHttpRequest('POST', tokenUrl, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, timeoutMs: 10000 });
+        const body =
+          `grant_type=client_credentials` +
+          `&client_id=${encodeURIComponent(args.clientId || '')}` +
+          `&client_secret=${encodeURIComponent(args.clientSecret || '')}` +
+          (scopes ? `&scope=${encodeURIComponent(scopes)}` : '');
+        const attempt = async () =>
+          makeHttpRequest('POST', tokenUrl, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body, timeoutMs: 10000 });
         let tokenResponse, tries = 0; let lastErr;
         while (tries < 3) {
-          try { tokenResponse = await attempt(); break; } catch (e) { lastErr = e; tries++; await new Promise(r=>setTimeout(r, 200 * tries)); }
+          try { tokenResponse = await attempt(); break; }
+          catch (e) { lastErr = e; tries++; await new Promise(r => setTimeout(r, 200 * tries)); }
         }
-        if (!tokenResponse) throw new Error(`Failed to get OAuth2 token: ${lastErr?.message||'unknown error'}`);
+        if (!tokenResponse) throw new Error(`Failed to get OAuth2 token: ${lastErr?.message || 'unknown error'}`);
         if (DEBUG_HTTP) console.log(`OAuth2 Token Response Status: ${tokenResponse.statusCode}`);
         if (tokenResponse.statusCode >= 400) throw new Error(`Failed to get OAuth2 token: ${tokenResponse.body}`);
         const token = JSON.parse(tokenResponse.body || '{}');
@@ -237,43 +278,67 @@ async function genericHandler(serializationInfo, args) {
   }
 
   if (Object.keys(requestCookies).length > 0) {
-    requestHeaders['Cookie'] = Object.entries(requestCookies).map(([k, v]) => `${k}=${v}`).join('; ');
+    const cookiePieces = Object.entries(requestCookies).map(([k, v]) => `${k}=${v}`);
+    requestHeaders['Cookie'] = [requestHeaders['Cookie'], cookiePieces.join('; ')].filter(Boolean).join('; ');
   }
 
   if (args.body !== undefined) {
     requestBody = args.body;
+    // Auto-JSON encode if it's a plain object and no content-type provided
+    const hasCT = Object.keys(requestHeaders).some(h => h.toLowerCase() === 'content-type');
+    if (!hasCT && (typeof requestBody === 'object' && requestBody !== null)) {
+      requestHeaders['Content-Type'] = 'application/json';
+      requestBody = JSON.stringify(requestBody);
+    }
   }
 
   const url = new URL(resolvedBaseUrl);
+  // Preserve any base path from OPENAPI_BASE_URL while replacing just the path component.
   url.pathname = resolvedPath;
-  Object.keys(requestQuery).forEach(key => url.searchParams.append(key, requestQuery[key]));
+
+  // Append query params; support arrays
+  Object.keys(requestQuery).forEach(key => {
+    const val = requestQuery[key];
+    if (Array.isArray(val)) {
+      val.forEach(v => url.searchParams.append(key, v));
+    } else if (val !== undefined && val !== null) {
+      url.searchParams.append(key, String(val));
+    }
+  });
 
   enforcePolicy(method, resolvedPath);
   checkRateLimit();
-  acquireConcurrency(resolvedPath);
+  const marker = acquireConcurrency(resolvedPath);
+
   try {
-    const response = await makeHttpRequest(method.toUpperCase(), url.toString(), { headers: requestHeaders, body: requestBody, timeoutMs: 30000 });
+    const response = await makeHttpRequest(
+      String(method || 'GET').toUpperCase(),
+      url.toString(),
+      { headers: requestHeaders, body: requestBody, timeoutMs: 30000 }
+    );
 
     if (response.statusCode >= 400) {
-    let msg = `API Error: ${response.statusCode} ${response.statusMessage}`;
-    try {
-      msg += ` - ${JSON.stringify(JSON.parse(response.body))}`;
-    } catch (_) {
-      msg += ` - ${response.body}`;
-    }
-    throw new Error(msg);
+      let msg = `API Error: ${response.statusCode} ${response.statusMessage}`;
+      try {
+        msg += ` - ${JSON.stringify(JSON.parse(response.body))}`;
+      } catch (_) {
+        msg += ` - ${response.body}`;
+      }
+      throw new Error(msg);
     }
 
     try {
-    return JSON.parse(response.body);
-  } catch (_) {
-    return response.body;
+      return JSON.parse(response.body);
+    } catch (_) {
+      return response.body;
     }
-  } finally { releaseConcurrency(resolvedPath); }
+  } finally {
+    releaseConcurrency(resolvedPath, marker);
+  }
 }
 
 const tools = [
-{
+  {
       name: 'testUnionAny',
       description: 'anyOf body schema',
       inputSchema: {
@@ -426,5 +491,6 @@ const tools = [
 ];
 
 module.exports = {
-    tools
-};
+  tools,
+  genericHandler, // export if you need to call it directly elsewhere
+};};

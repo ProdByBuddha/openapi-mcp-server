@@ -7,12 +7,12 @@
  * - Output: --out <path> (default: examples/generated/n8n-openapi-tools.json)
  */
 
-const fs = require('fs');
-const path = require('path');
-const https = require('https');
-const http = require('http');
-const { generateMcpTools } = require('../../lib/openapi-generator');
-const { generateMcpServer } = require('../../lib/openapi-generator/server-generator');
+import fs from 'fs';
+import path from 'path';
+import https from 'https';
+import http from 'http';
+import { generateMcpTools } from '../../lib/openapi-generator/index.js';
+import { generateMcpServer } from '../../lib/openapi-generator/server-generator.js';
 
 function parseArgs(argv) {
   const out = { _: [] };
@@ -67,7 +67,7 @@ async function loadSpecFromUrl(url) {
   // Try JSON
   try { return JSON.parse(res.body); } catch (_) {}
   // Try YAML
-  try { const YAML = require('yaml'); return YAML.parse(res.body); } catch (_) {}
+  try { const YAML = await import('yaml'); return YAML.parse(res.body); } catch (_) {}
   // Try to extract swaggerDoc JSON from a JS init file
   const body = String(res.body);
   const idx = body.indexOf('"swaggerDoc"');

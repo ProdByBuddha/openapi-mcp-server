@@ -88,8 +88,8 @@ The project follows a modular architecture with clear separation between core lo
 
 ### Core Directories
 - **`lib/openapi-generator/`**: Core tool generation engine (ES modules)
-  - `index.js`: Main generator functions and HTTP utilities
-  - `server-generator.js`: Full MCP server scaffolding generator
+  - `index.js`: Main generator functions and HTTP utilities with ES module imports
+  - `server-generator.js`: Full MCP server scaffolding generator (complete ES modules conversion with `__filename`/`__dirname` polyfills)
   - `templates/`: JavaScript server templates (.js, package.json, README, etc.)
   - `templates-ts/`: TypeScript server templates (.ts, tsconfig.json, etc.)
 
@@ -99,12 +99,12 @@ The project follows a modular architecture with clear separation between core lo
   - `mcp-hostinger-server.js`: Dedicated Hostinger integration server
   - `mcp-docker-server.js`: Docker CLI and Engine API wrapper
   - `mcp-openapi-server.js`: Generic OpenAPI server (converted to ES modules)
-  - `generate-openapi-mcp-tools.js`: CLI tool generator
   - `n8n-workflows-cli.js`: n8n workflow management CLI
   - `scripts/`: Automation utilities (spec discovery, validation, merging, config templates)
-    - `create-config-templates.js`: Generate configuration templates and validation scripts
-    - `generate-config-schemas.js`: Extract and generate configuration schemas
-    - `generate-config-templates.js`: Generate configuration templates for common use cases
+    - `generate-openapi-mcp-tools.js`: CLI tool generator (ES modules)
+    - `generate-config-templates.js`: Generate configuration templates for common use cases with validation scripts and migration guides
+    - `generate-config-schemas.js`: Extract and generate configuration schemas from codebase analysis
+    - `validate-templates.js`: Validate configuration templates and environment variables
   - `generated/`: Auto-generated tool definitions and documentation
   - `config-templates/`: Generated configuration templates for common use cases
 
@@ -129,9 +129,11 @@ The project follows a modular architecture with clear separation between core lo
   - `services.dynamic.json`: Production configuration with 15+ popular services
   - `services.example.json`: Template with all configuration options
 - **Configuration Templates**: `examples/config-templates/`
-  - Individual service templates (`n8n.json`, `hostinger.json`, `docker.json`)
+  - Individual service templates (`n8n-service.json`, `hostinger-service.json`, `adobe_pdf-service.json`, `docker-service.json`)
   - Multi-service template (`multi-service.json`)
-  - Validation scripts (`validate-config.js`)
+  - Development and production templates (`development.json`, `production.json`)
+  - Single service template (`single-service.json`)
+  - Validation scripts (`validate-templates.js`)
   - Migration guides (`MIGRATION.md`)
 - **Environment**: `.env.example`, `.env` (local)
 - **MCP Client**: `mcp.config.json` (sample Cursor/Kiro configuration)
@@ -146,13 +148,13 @@ The project follows a modular architecture with clear separation between core lo
 
 **Tool Generation**:
 - `npm run mcp:gen`: Generate tools from OpenAPI spec
+- `node examples/scripts/generate-openapi-mcp-tools.js`: CLI tool generator (ES modules)
 - `npm run mcp:gen:server`: Generate complete MCP server project
 - `npm run mcp:tools:readme`: Build tools documentation
 
 **Configuration Management**:
-- `node examples/scripts/create-config-templates.js`: Generate configuration templates
-- `node examples/scripts/generate-config-schemas.js`: Generate configuration schemas
-- `node examples/scripts/generate-config-templates.js`: Generate configuration templates
+- `node examples/scripts/generate-config-templates.js`: Generate configuration templates with validation and migration guides
+- `node examples/scripts/generate-config-schemas.js`: Generate configuration schemas from codebase analysis
 
 **Testing & Validation**:
 - `npm test`: Full test suite (E2E + unit tests)
@@ -207,7 +209,7 @@ The server provides universal OpenAPI 3.x integration plus first-class support f
   - **Content Extraction**: Extract text, images, and structure from PDFs
   - **Document Generation**: Generate PDFs from templates and JSON data
 - **API Coverage**: Assets, operations (combine, OCR, protect, extract, document generation), job status tracking
-- **Configuration**: Available in `services.dynamic.json` as `adobe_pdf` service
+- **Configuration**: Available in `services.dynamic.json` as `adobe_pdf` service and MCP configuration in `.kiro/settings/mcp.json`
 
 ### Multi-Service Host Architecture
 **Single Process, Multiple APIs**: Configure unlimited services in one MCP server
@@ -218,7 +220,7 @@ The server provides universal OpenAPI 3.x integration plus first-class support f
 - **Filtering**: Include/exclude operations by tags, paths, or regex patterns
 
 #### Pre-configured Service Ecosystem (services.dynamic.json)
-**15+ Popular Services Ready-to-Use**:
+**16+ Popular Services Ready-to-Use**:
 - **Development**: GitHub, Slack, Notion, Docker
 - **Business**: Stripe, SendGrid, Airtable, Wix
 - **Infrastructure**: n8n, Hostinger
@@ -285,10 +287,12 @@ node examples/mcp-multi-host.js --config services.default.json --once tools/list
 ```bash
 # Generate tools from any OpenAPI spec
 npm run mcp:gen -- --from-url https://api.example.com/openapi.json --out tools.json
+node examples/scripts/generate-openapi-mcp-tools.js --from-url https://api.example.com/openapi.json --out tools.json
 
 # Generate complete MCP server project (ES modules by default)
 OPENAPI_BASE_URL=https://api.example.com npm run mcp:gen:server -- \
   --from-file spec.json --generate-server ./my-server --ts true
+node examples/scripts/generate-openapi-mcp-tools.js --from-file spec.json --generate-server ./my-server --ts true
 
 # Auto-discover specs from documentation
 npm run discover:spec -- --url https://docs.example.com/api
@@ -297,9 +301,9 @@ npm run discover:spec -- --url https://docs.example.com/api
 #### Service Configuration Management
 ```bash
 # Generate configuration templates for common use cases
-node examples/scripts/create-config-templates.js --validate --migration
+node examples/scripts/generate-config-templates.js --validate --migration
 
-# Generate configuration schemas from codebase
+# Generate configuration schemas from codebase analysis
 node examples/scripts/generate-config-schemas.js --out schemas/config-schema.json
 
 # Regenerate service configs from all specs
@@ -311,11 +315,8 @@ npm run services:report
 # Validate service configuration
 npm run services:lint:config
 
-# Validate specific service environment
-node examples/config-templates/validate-config.js n8n
-
-# Validate configuration file
-node examples/config-templates/validate-config.js services.json
+# Validate configuration templates
+node examples/config-templates/validate-templates.js
 ```
 
 ### Testing Strategy
@@ -349,12 +350,13 @@ node examples/scripts/spec-gate.js --file spec.json --runs 5 --include-tags Doma
 ### Quality Assurance
 
 #### Code Quality
-- **ES Modules**: All code uses modern ES module syntax (`import`/`export`) with proper module import handling for better tree-shaking and static analysis
+- **ES Modules**: All code uses modern ES module syntax (`import`/`export`) with complete conversion of core generator components including server-generator.js with proper `__filename`/`__dirname` polyfills for Node.js compatibility
+- **Template System**: Robust template processing with proper character escaping and syntax validation to prevent conflicts during code generation
 - **YAML/JSON Parsing**: Robust file format detection with proper ES module imports for YAML processing
 - **Linting**: OpenAPI spec validation with swagger-parser
-- **Security**: Built-in hardening controls and audit logging
-- **Performance**: Rate limiting and resource management
-- **Reliability**: Comprehensive error handling and fallback mechanisms
+- **Security**: Built-in hardening controls and audit logging with comprehensive rate limiting and access controls
+- **Performance**: Advanced rate limiting with token bucket algorithm, concurrency controls, and resource management
+- **Reliability**: Comprehensive error handling, fallback mechanisms, and graceful service loading
 
 #### CI/CD Integration
 - **GitHub Actions**: Automated testing and tool regeneration
@@ -363,7 +365,7 @@ node examples/scripts/spec-gate.js --file spec.json --runs 5 --include-tags Doma
 
 ### Contribution Guidelines
 - **Code Standards**: Follow existing patterns in `examples/` and `lib/`, use ES module syntax (`import`/`export`)
-- **ES Modules**: All new code must use ES modules - no CommonJS (`require`/`module.exports`)
+- **ES Modules**: All code uses ES modules - the project has been fully converted from CommonJS with complete ES module syntax throughout core components including proper `__filename`/`__dirname` polyfills where needed
 - **Testing**: Add tests for new features, ensure spec-gate passes
 - **Documentation**: Update relevant `.md` files and inline comments
 - **Security**: Follow security best practices, no hardcoded credentials
@@ -373,37 +375,41 @@ For detailed contribution guidelines, see `CONTRIBUTING.md`.
 
 ## Current Version & Recent Improvements
 
-**Version 1.6.4+** - Latest stable release with comprehensive configuration management and recent stability fixes:
+**Version 1.7.0** - Latest stable release with comprehensive configuration management and enhanced service ecosystem:
 
 ### Major Features Added
-- **ES Modules Architecture**: Full conversion to ES modules (`"type": "module"`) for modern Node.js compatibility
+- **ES Modules Architecture**: Full conversion to ES modules (`"type": "module"`) for modern Node.js compatibility with core generator components and most example scripts converted
 - **Enhanced Environment Loading**: Upgraded to `@dotenvx/dotenvx` with fallback to basic `dotenv` for improved environment variable management and Vault integration
-- **Multi-Transport Architecture**: Full support for stdio, HTTP, WebSocket, and SSE transports
+- **Multi-Transport Architecture**: Full support for stdio, HTTP, WebSocket, and SSE transports with dynamic port allocation
 - **SOAP/WSDL Integration**: Experimental support for legacy SOAP services
 - **TypeScript Server Generation**: Complete TypeScript project scaffolding with type safety
 - **Auto-Discovery System**: Extract OpenAPI specs from documentation pages automatically
-- **Comprehensive Service Ecosystem**: 15+ pre-configured popular services in `services.dynamic.json`
+- **Comprehensive Service Ecosystem**: 16+ pre-configured popular services in `services.dynamic.json`
 - **Adobe PDF Services Integration**: Full support for PDF processing operations (combine, OCR, protect, extract, document generation)
+- **Configuration Template System**: Automated generation of configuration templates with validation scripts and migration guides
+- **Enhanced Documentation**: Improved formatting and consistency across configuration files
 - **Robust Path Parameter Handling**: Automatic extraction of path parameters from URL templates with fallback mechanisms for incomplete OpenAPI specs
 
 ### Developer Experience Improvements
-- **ES Modules Migration**: Complete conversion from CommonJS to ES modules with proper module import handling for modern Node.js compatibility and better performance
+- **ES Modules Migration**: Complete conversion from CommonJS to ES modules including all core generator components (server-generator.js with proper `__filename`/`__dirname` polyfills) and main example scripts with proper module import handling for modern Node.js compatibility and better performance
+- **Enhanced Template Processing**: Improved template rendering system with proper character escaping to prevent conflicts during server generation
 - **Enhanced File Processing**: Improved YAML/JSON parsing with correct ES module imports ensuring reliable specification file processing
-- **Configuration Management System**: Complete configuration template generator with validation scripts and migration guides
-- **Spec Gate Validation**: Conformance + fuzz testing for OpenAPI specs
+- **Configuration Management System**: Complete configuration template generator with validation scripts, migration guides, and automated schema generation
+- **Dynamic Port Allocation**: Automatic port discovery for HTTP transports to avoid conflicts
+- **Spec Gate Validation**: Conformance + fuzz testing for OpenAPI specs with comprehensive coverage
 - **GitHub Wiki Integration**: Auto-generated documentation with CI/CD pipeline
-- **Enhanced CLI Tools**: One-shot execution mode, service configuration management, template generation
-- **Improved Error Handling**: Better error messages and fallback mechanisms
-- **Security Hardening**: Enhanced rate limiting, audit logging, and access controls
+- **Enhanced CLI Tools**: One-shot execution mode, service configuration management, template generation with validation
+- **Improved Error Handling**: Better error messages, fallback mechanisms, and graceful service loading with auth validation
+- **Security Hardening**: Enhanced rate limiting, audit logging, and access controls with per-service authentication validation
 - **OpenAPI Spec Compatibility**: Enhanced parsing with automatic path parameter detection for better compatibility with various OpenAPI specification formats
-- **Recent Stability Fixes**: Fixed syntax error in WebSocket transport initialization ensuring proper Express app setup and improved error handling in multi-transport scenarios
 
 ### Architecture Evolution
-- **Modern ES Modules**: Full conversion to ES modules with proper module import handling for better tree-shaking, static analysis, and future compatibility
+- **Modern ES Modules**: Complete conversion to ES modules including all core generator components (index.js, server-generator.js with proper `__filename`/`__dirname` polyfills) and main example scripts with proper module import handling for better tree-shaking, static analysis, and future compatibility
+- **Enhanced Template Processing**: Improved template rendering with proper escaping of special characters to prevent conflicts during code generation
 - **Robust File Processing**: Enhanced YAML/JSON parsing with proper ES module imports ensuring reliable spec file processing
 - **Primary Entry Point**: `examples/mcp-multi-host.js` as the main server
 - **Modular Design**: Clear separation between core generator and service implementations
 - **Extensible Plugin System**: Easy addition of new service integrations
 - **Production Ready**: Comprehensive testing, CI/CD, and monitoring capabilities
 
-The project has evolved from a simple n8n integration to a comprehensive OpenAPI-to-MCP bridge supporting enterprise-grade deployments with multiple services, security controls, and extensive customization options. The recent conversion to ES modules with proper import handling ensures compatibility with modern Node.js ecosystems and improved performance.
+The project has evolved from a simple n8n integration to a comprehensive OpenAPI-to-MCP bridge supporting enterprise-grade deployments with multiple services, security controls, and extensive customization options. Version 1.7.0 represents a mature, production-ready platform with comprehensive configuration management, automated template generation, and robust service ecosystem supporting 16+ popular APIs out of the box.
