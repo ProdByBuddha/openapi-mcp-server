@@ -89,6 +89,7 @@ function releaseConcurrency(path, id) {
       break;
     }
   }
+  const PER_PATH_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY_PER_PATH || 0);
   if (PER_PATH_CONCURRENCY > 0) {
     const n = inflightPerPath.get(path) || 1;
     inflightPerPath.set(path, Math.max(0, n - 1));
