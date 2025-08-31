@@ -3,26 +3,6 @@ const { z } = require('zod');
 const { randomUUID } = require('crypto');
 
 // Hardening controls for outgoing HTTP
-const ALLOWED_METHODS = new Set(
-  String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE')
-    .split(',')
-    .map(s => s.trim().toUpperCase())
-    .filter(Boolean)
-);
-
-const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').filter(p => p.trim());
-const ALLOWED_METHODS_LIST = (process.env.OPENAPI_MCP_ALLOWED_METHODS || '').split(',').filter(m => m.trim());
-
-const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0); // average per window
-const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0); // token bucket burst
-const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
-const GLOBAL_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY || 0); // 0 = unlimited
-const PER_PATH_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY_PER_PATH || 0);
-
-let rateWindowStart = Date.now();
-let rateCount = 0;
-let tokens = RATE_BURST;
-let lastRefill = Date.now();
 
 const inflight = new Set(); // holds unique UUIDs
 const inflightPerPath = new Map();
@@ -34,29 +14,48 @@ function wildcardToRegExp(pattern) {
   return new RegExp('^' + esc + '$');
 }
 
-// COMPILED REGEXES (was missing before)
-const ALLOWED_PATH_REGEXES = ALLOWED_PATH_PATTERNS.map(wildcardToRegExp);
-
 function checkRateLimit() {
-  const now = Date.now();
-  if (now - rateWindowStart >= RATE_WINDOW_MS) {
-    rateWindowStart = now;
-    rateCount = 0;
-  }
-  rateCount += 1;
+    // CONFIG - re-evaluate on each call
+    const RATE_LIMIT = Number(process.env.OPENAPI_MCP_RATE_LIMIT || 0);
+    if (RATE_LIMIT <= 0) return; // No rate limiting applied
 
-  if (RATE_LIMIT > 0) {
-    // token bucket refill
-    const elapsed = Math.max(0, now - lastRefill);
-    const ratePerMs = RATE_LIMIT / RATE_WINDOW_MS;
-    tokens = Math.min(RATE_BURST, tokens + elapsed * ratePerMs);
-    lastRefill = now;
-    if (tokens < 1) throw new Error('Rate limit exceeded');
-    tokens -= 1;
-  }
+    const RATE_BURST = Number(process.env.OPENAPI_MCP_RATE_BURST || RATE_LIMIT || 0);
+    const RATE_WINDOW_MS = Number(process.env.OPENAPI_MCP_RATE_WINDOW_MS || 60000);
+    const now = Date.now();
+
+    // STATE - stored on function object to persist
+    // Initialize state on first run, or if burst rate changes, effectively resetting the limiter
+    if (checkRateLimit.tokens === undefined || checkRateLimit.lastBurst !== RATE_BURST) {
+        checkRateLimit.tokens = RATE_BURST;
+        checkRateLimit.lastBurst = RATE_BURST;
+        checkRateLimit.lastRefill = now;
+    }
+
+    // REFILL tokens based on elapsed time
+    const elapsed = now - checkRateLimit.lastRefill;
+    if (elapsed > 0) {
+        const ratePerMs = RATE_LIMIT / RATE_WINDOW_MS;
+        checkRateLimit.tokens = Math.min(RATE_BURST, checkRateLimit.tokens + elapsed * ratePerMs);
+        checkRateLimit.lastRefill = now;
+    }
+
+    // CONSUME a token
+    if (checkRateLimit.tokens < 1) {
+        throw new Error('Rate limit exceeded');
+    }
+    checkRateLimit.tokens -= 1;
 }
 
 function enforcePolicy(method, path) {
+  const ALLOWED_METHODS = new Set(
+    String(process.env.OPENAPI_MCP_ALLOWED_METHODS || 'GET,POST,PUT,PATCH,DELETE')
+      .split(',')
+      .map(s => s.trim().toUpperCase())
+      .filter(Boolean)
+  );
+  const ALLOWED_PATH_PATTERNS = (process.env.OPENAPI_MCP_ALLOWED_PATHS || '').split(',').map(p => p.trim()).filter(Boolean);
+  const ALLOWED_PATH_REGEXES = ALLOWED_PATH_PATTERNS.map(wildcardToRegExp);
+
   const m = String(method || '').toUpperCase();
   if (!ALLOWED_METHODS.has(m)) throw new Error(`Method not allowed: ${m}`);
   const p = String(path || '');
@@ -66,6 +65,9 @@ function enforcePolicy(method, path) {
 
 // Return a unique marker so we can release the exact one we acquired
 function acquireConcurrency(path) {
+  const GLOBAL_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY || 0);
+  const PER_PATH_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY_PER_PATH || 0);
+
   if (GLOBAL_CONCURRENCY > 0 && inflight.size >= GLOBAL_CONCURRENCY) {
     throw new Error('Concurrency limit exceeded');
   }
@@ -89,6 +91,7 @@ function releaseConcurrency(path, id) {
       break;
     }
   }
+  const PER_PATH_CONCURRENCY = Number(process.env.OPENAPI_MCP_CONCURRENCY_PER_PATH || 0);
   if (PER_PATH_CONCURRENCY > 0) {
     const n = inflightPerPath.get(path) || 1;
     inflightPerPath.set(path, Math.max(0, n - 1));
@@ -344,4 +347,4 @@ const tools = [
 module.exports = {
   tools,
   genericHandler, // export if you need to call it directly elsewhere
-};};
+};
