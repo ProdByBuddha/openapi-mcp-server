@@ -47,6 +47,56 @@ function readJson(filePath) {
   assert(t.inputSchema && typeof t.inputSchema === 'object', 'tool has inputSchema');
   assert(t.method && t.pathTemplate, 'tool includes method and pathTemplate metadata');
 
+  const xquikSpec = {
+    openapi: '3.1.0',
+    info: { title: 'Xquik API', version: '1.0' },
+    servers: [{ url: 'https://xquik.com' }],
+    components: {
+      securitySchemes: {
+        apiKey: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'x-api-key'
+        }
+      }
+    },
+    paths: {
+      '/api/v1/x/tweets/search': {
+        get: {
+          operationId: 'searchTweets',
+          summary: 'Search X posts',
+          security: [{ apiKey: [] }],
+          parameters: [
+            { name: 'q', in: 'query', required: true, schema: { type: 'string' } },
+            {
+              name: 'queryType',
+              in: 'query',
+              required: false,
+              schema: { type: 'string', enum: ['Latest', 'Top'], default: 'Latest' }
+            },
+            {
+              name: 'limit',
+              in: 'query',
+              required: false,
+              schema: { type: 'integer', minimum: 1, maximum: 200, default: 20 }
+            }
+          ]
+        }
+      }
+    }
+  };
+  const xquikTools = await generateMcpTools(xquikSpec, { baseUrl: 'https://xquik.com' });
+  const search = xquikTools.find((tool) => tool.name === 'searchTweets');
+  assert(search, 'Xquik search tool should be generated');
+  assert.strictEqual(search.method, 'GET');
+  assert.strictEqual(search.pathTemplate, '/api/v1/x/tweets/search');
+  assert(search.inputSchema.required.includes('q'), 'q query should stay required');
+  assert.deepStrictEqual(search.inputSchema.properties.queryType.enum, ['Latest', 'Top']);
+  assert.strictEqual(search.inputSchema.properties.queryType.default, 'Latest');
+  assert.strictEqual(search.inputSchema.properties.limit.maximum, 200);
+  assert(search.inputSchema.properties['x-api-key'], 'Xquik api key header should be modeled');
+  assert(search.serializationInfo.queryParams.includes('q'), 'q should stay a query parameter');
+
   // 2) Offline JSON generation via CLI and validation of shape
   const tmpDir = path.resolve(__dirname, 'tmp');
   const specPath = path.join(tmpDir, 'simple-openapi.json');
