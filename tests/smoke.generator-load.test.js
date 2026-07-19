@@ -48,10 +48,18 @@ function readJson(filePath) {
   assert(t.method && t.pathTemplate, 'tool includes method and pathTemplate metadata');
 
   const xquikSpec = {
-    openapi: '3.1.0',
+    openapi: '3.1.1',
     info: { title: 'Xquik API', version: '1.0' },
     servers: [{ url: 'https://xquik.com' }],
     components: {
+      parameters: {
+        searchQuery: {
+          name: 'q',
+          in: 'query',
+          required: true,
+          schema: { type: 'string' }
+        }
+      },
       securitySchemes: {
         apiKey: {
           type: 'apiKey',
@@ -67,7 +75,7 @@ function readJson(filePath) {
           summary: 'Search X posts',
           security: [{ apiKey: [] }],
           parameters: [
-            { name: 'q', in: 'query', required: true, schema: { type: 'string' } },
+            { $ref: '#/components/parameters/searchQuery' },
             {
               name: 'queryType',
               in: 'query',
