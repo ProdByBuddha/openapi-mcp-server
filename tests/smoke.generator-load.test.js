@@ -1,4 +1,5 @@
 import fs from 'fs';
+import http from 'http';
 import path from 'path';
 import assert from 'assert';
 import { spawnSync } from 'child_process';
@@ -17,6 +18,14 @@ function writeJson(filePath, obj) {
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+}
+
+function listen(server) {
+  return new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+}
+
+function close(server) {
+  return new Promise((resolve, reject) => server.close((err) => err ? reject(err) : resolve()));
 }
 
 (async () => {
@@ -104,6 +113,47 @@ function readJson(filePath) {
   assert.strictEqual(search.inputSchema.properties.limit.maximum, 200);
   assert(search.inputSchema.properties['x-api-key'], 'Xquik api key header should be modeled');
   assert(search.serializationInfo.queryParams.includes('q'), 'q should stay a query parameter');
+
+  const externalParameter = {
+    searchQuery: {
+      name: 'q',
+      in: 'query',
+      required: true,
+      schema: { type: 'string' }
+    }
+  };
+  const externalRoot = {
+    openapi: '3.1.1',
+    info: { title: 'External reference API', version: '1.0' },
+    servers: [{ url: 'https://example.com' }],
+    paths: {
+      '/search': {
+        get: {
+          operationId: 'externalSearch',
+          parameters: [{ $ref: './parameters.json#/searchQuery' }]
+        }
+      }
+    }
+  };
+  const externalDir = path.resolve(__dirname, 'tmp', 'openapi-31-external');
+  const externalSpecPath = path.join(externalDir, 'openapi.json');
+  writeJson(externalSpecPath, externalRoot);
+  writeJson(path.join(externalDir, 'parameters.json'), externalParameter);
+  const fileTools = await generateMcpTools(externalSpecPath);
+  assert(fileTools[0].inputSchema.required.includes('q'), 'OpenAPI 3.1 file references should resolve');
+
+  const server = http.createServer((req, res) => {
+    res.setHeader('content-type', 'application/json');
+    res.end(JSON.stringify(req.url === '/parameters.json' ? externalParameter : externalRoot));
+  });
+  await listen(server);
+  try {
+    const address = server.address();
+    const urlTools = await generateMcpTools(`http://127.0.0.1:${address.port}/openapi.json`);
+    assert(urlTools[0].inputSchema.required.includes('q'), 'OpenAPI 3.1 URL references should resolve');
+  } finally {
+    await close(server);
+  }
 
   // 2) Offline JSON generation via CLI and validation of shape
   const tmpDir = path.resolve(__dirname, 'tmp');
